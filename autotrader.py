@@ -222,15 +222,20 @@ for i in list(range(0, 100, 100)):
 
         print('Link:', link)
 
-        product_soup = recursive_try(link)
+        try:
 
-        raw_data = get_raw_data(product_soup)
+            product_soup = recursive_try(link)
 
-        structured_data = get_values(raw_data)
+            raw_data = get_raw_data(product_soup)
 
-        doc = upload_data(structured_data)
+            structured_data = get_values(raw_data)
 
-        documents.append(doc)
+            doc = upload_data(structured_data)
+
+            documents.append(doc)
+
+        except:
+            print("Skipping Link:", link)
     
     result = collection.insert_many(documents)
 
