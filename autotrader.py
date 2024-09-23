@@ -214,8 +214,6 @@ for i in list(range(0, 100, 100)):
     req = requests.get(f'https://www.autotrader.ca/cars/?rcp=100&rcs={i}&srt=35&prx=-1&loc=K0E%200B2&hprc=True&wcp=True&inMarket=advancedSearch', headers=headers)
     soup = BeautifulSoup(req.content, 'html.parser')
 
-    print(req.content)
-
     main_listing_div = soup.find('div', id='SearchListings')
     listing_divs = soup.find_all('div', attrs={'class': 'dealer-split-wrapper'})
 
