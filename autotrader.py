@@ -31,6 +31,9 @@ driver_type_collection = db['drivertypes']
 fuel_type_collection = db['fueltypes']
 transmission_collection = db['transmissions']
 
+titles = list(collection.find({}, { "title": 1, "_id": 0 }))
+titles = [t['title'] for t in titles]
+
 def get_raw_data(soup):
     raw_values = {}
 
@@ -229,6 +232,10 @@ for i in list(range(0, 100, 100)):
             raw_data = get_raw_data(product_soup)
 
             structured_data = get_values(raw_data)
+
+            if structured_data['title'] in titles:
+                print('Duplicate listing:', {structured_data['title']})
+                break
 
             doc = upload_data(structured_data)
 
