@@ -63,7 +63,6 @@ def get_values(data):
     year = None
     mileage = None
     type = None
-    condition_analysis = None
     vin = None
     zip_code = None
     fuel_type = None
@@ -137,7 +136,7 @@ def get_values(data):
         'description': description,
         'make': make,
         'model': model,
-        'year': year,
+        'year': int(year),
         'mileage': mileage,
         'bodyType': type,
         'condition': condition,
@@ -147,7 +146,7 @@ def get_values(data):
         # 'fuelType': # hamza said not using
         "driverType": None, # Not found
         'transmission': transmission,
-        'cylinder': cylinder,
+        'cylinder': int(cylinder),
         'engineSize': engine,
         'engineType': fuel_type,
         'registrationStatus': None, # Not found
