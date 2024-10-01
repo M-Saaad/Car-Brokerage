@@ -105,6 +105,9 @@ def get_values(data):
     # views = data['ngVdpModel'][''] # not found
     # likes = data['ngVdpModel'][''] # not found
 
+    if condition not in ["New", "Used"]:
+        condition = None
+
     image_list = []
     for image_doc in image_urls:
         image_list.append(image_doc.get('photoViewerUrl'))
@@ -184,13 +187,16 @@ def recursive_try(link):
 
 def get_id(collection, field_value):
     
-    doc = collection.find_one(field_value)
+    if field_value:
+        doc = collection.find_one(field_value)
 
-    if doc:
-        return doc['_id']
+        if doc:
+            return doc['_id']
+        else:
+            result = collection.insert_one(field_value)
+            return result.inserted_id
     else:
-        result = collection.insert_one(field_value)
-        return result.inserted_id
+        return None
     
 def upload_data(data):
     data['make'] = get_id(make_collection, {'name': data['make']})
