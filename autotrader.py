@@ -94,6 +94,7 @@ def get_values(data):
     model = data['ngVdpModel']['hero'].get('model')
     year = data['ngVdpModel']['hero'].get('year')
     mileage = data['ngVdpModel']['hero'].get('mileage')
+    condition = data['ngVdpModel']['hero'].get('status')
     vin = data['ngVdpModel']['hero'].get('vin')
     zip_code = data['ngVdpModel']['ngIcoModel'].get('postalCode')
     price = data['ngVdpModel']['hero'].get('price')
@@ -131,9 +132,6 @@ def get_values(data):
         if specs['key'] == 'Doors':
             doors = specs['value']
 
-    # New added
-    condition_analysis = data['ngVdpModel']['conditionAnalysis'].get('options')
-
     return {
         'title': title,
         'description': description,
@@ -142,7 +140,7 @@ def get_values(data):
         'year': year,
         'mileage': mileage,
         'bodyType': type,
-        'condition': condition_analysis,
+        'condition': condition,
         'assembly': None, # Not found
         'vin': vin,
         'zipCode': zip_code,
