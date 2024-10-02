@@ -105,6 +105,11 @@ def get_values(data):
     # views = data['ngVdpModel'][''] # not found
     # likes = data['ngVdpModel'][''] # not found
 
+    pattern = r"(?<=new & used )(.*?)(?= for sale within)"
+    temp_title = re.search(pattern, title)
+    if temp_title:
+        title = temp_title.group(0)
+
     if condition not in ["New", "Used"]:
         condition = None
 
@@ -169,7 +174,7 @@ def get_values(data):
         "cpePick": False,
         'soldThrough': None, # Dont know
         "package": 'Free',
-        "userId": "Admin",
+        "userId": "Admin 1",
         "createdAt": datetime.now(),
         "updatedAt": datetime.now()
     }
@@ -214,7 +219,7 @@ def upload_data(data):
 
     return data
 
-for i in list(range(0, 100, 100)):
+for i in list(range(0, 100, 200)):
     print("Index:", i)
     documents = []
     req = requests.get(f'https://www.autotrader.ca/cars/?rcp=100&rcs={i}&srt=35&prx=-1&loc=K0E%200B2&hprc=True&wcp=True&inMarket=advancedSearch', headers=headers)
