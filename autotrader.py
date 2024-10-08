@@ -56,7 +56,7 @@ def preprocess_image(image_url):
 
 def extract_features(image_path):
     img_array = preprocess_image(image_path)
-    features = model.predict(img_array)
+    features = model.predict(img_array, verbose=0)
     return features
 
 def get_raw_data(soup):
