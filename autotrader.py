@@ -35,7 +35,7 @@ titles = list(collection.find({}, { "title": 1, "_id": 0 }))
 titles = [t['title'] for t in titles]
 
 mileages = list(collection.find({}, { "mileage": 1, "_id": 0 }))
-mileages = [t['title'] for t in mileages]
+mileages = [m['mileage'] for m in mileages]
 
 
 def get_raw_data(soup):
