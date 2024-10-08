@@ -9,9 +9,9 @@ import tensorflow as tf
 from bs4 import BeautifulSoup
 from datetime import datetime
 from pymongo import MongoClient
-from tensorflow.keras.preprocessing import image
-from sklearn.metrics.pairwise import cosine_similarity
-from tensorflow.keras.applications import EfficientNetB0
+# from tensorflow.keras.preprocessing import image
+# from sklearn.metrics.pairwise import cosine_similarity
+# from tensorflow.keras.applications import EfficientNetB0
 
 headers = {
   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
@@ -42,22 +42,22 @@ docs = list(collection.find({}, { "title": 1, "mileage": 1, "_id": 0 }))
 titles = [t['title'] for t in docs]
 mileages = [m['mileage'] for m in docs]
 
-# Load pre-trained model (fine-tuned for car detection)
-model = EfficientNetB0(weights='imagenet')
+# # Load pre-trained model (fine-tuned for car detection)
+# model = EfficientNetB0(weights='imagenet')
 
-def preprocess_image(image_url):
-    response = requests.get(image_url)
-    img = Image.open(BytesIO(response.content))
-    img = img.resize((224, 224))
-    img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array = tf.keras.applications.efficientnet.preprocess_input(img_array)
-    return img_array
+# def preprocess_image(image_url):
+#     response = requests.get(image_url)
+#     img = Image.open(BytesIO(response.content))
+#     img = img.resize((224, 224))
+#     img_array = image.img_to_array(img)
+#     img_array = np.expand_dims(img_array, axis=0)
+#     img_array = tf.keras.applications.efficientnet.preprocess_input(img_array)
+#     return img_array
 
-def extract_features(image_path):
-    img_array = preprocess_image(image_path)
-    features = model.predict(img_array, verbose=0)
-    return features.tolist()
+# def extract_features(image_path):
+#     img_array = preprocess_image(image_path)
+#     features = model.predict(img_array, verbose=0)
+#     return features.tolist()
 
 def get_raw_data(soup):
     raw_values = {}
@@ -138,15 +138,15 @@ def get_values(data):
     if condition not in ["New", "Used"]:
         condition = None
 
-    image_features = []
+    # image_features = []
     image_list = []
     for image_doc in image_urls:
         image_url = image_doc.get('photoViewerUrl')
         image_list.append(image_url)
-        try:
-            image_features.append(extract_features(image_url))
-        except:
-            print('Cannot extract feature:', image_url)
+        # try:
+        #     image_features.append(extract_features(image_url))
+        # except:
+        #     print('Cannot extract feature:', image_url)
 
     for specs in data['ngVdpModel']['specifications']['specs']:
         if specs['key'] == 'Body Type':
@@ -195,7 +195,7 @@ def get_values(data):
         'price': int(price.replace(',', '')),
         'features': features,
         'imageUrls': image_list,
-        'imageFeatures': image_features,
+        # 'imageFeatures': image_features,
         'country': country,
         'city': city,
         'website': 'AutoTrader',
