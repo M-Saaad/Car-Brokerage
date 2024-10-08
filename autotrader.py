@@ -243,7 +243,7 @@ for i in list(range(99800, 0, -100)):
 
             if structured_data['title'] in titles:
                 print('Duplicate listing:', {structured_data['title']})
-                break
+                continue
 
             doc = upload_data(structured_data)
 
