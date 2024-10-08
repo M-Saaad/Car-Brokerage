@@ -223,7 +223,7 @@ def upload_data(data):
 
     return data
 
-for i in list(range(99700, 0, -100)):
+for i in list(range(99000, 0, -100)):
     print("Index:", i)
     documents = []
     req = requests.get(f'https://www.autotrader.ca/cars/?rcp=100&rcs={i}&srt=35&prx=-1&loc=K0E%200B2&hprc=True&wcp=True&inMarket=advancedSearch', headers=headers)
