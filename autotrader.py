@@ -34,6 +34,10 @@ transmission_collection = db['transmissions']
 titles = list(collection.find({}, { "title": 1, "_id": 0 }))
 titles = [t['title'] for t in titles]
 
+mileages = list(collection.find({}, { "mileage": 1, "_id": 0 }))
+mileages = [t['title'] for t in mileages]
+
+
 def get_raw_data(soup):
     raw_values = {}
 
@@ -241,7 +245,7 @@ for i in list(range(99700, 0, -100)):
 
             structured_data = get_values(raw_data)
 
-            if structured_data['title'] in titles:
+            if structured_data['title'] in titles and structured_data['mileage'] in mileages:
                 print('Duplicate listing:', {structured_data['title']})
                 continue
 
