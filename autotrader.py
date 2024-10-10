@@ -1,4 +1,5 @@
 import re
+import sys
 import time
 import json
 import requests
@@ -217,7 +218,7 @@ def recursive_try(link):
     
     if len(product_soup.text) < 100:
         print('Waiting...')
-        time.sleep(10*60)
+        time.sleep(15*60)
         product_soup = recursive_try(link)
     
     return product_soup
@@ -251,7 +252,7 @@ def upload_data(data):
 
     return data
 
-for i in list(range(59600, 0, -100)):
+for i in list(range(int(sys.argv[1]), 0, -100)):
     print("Index:", i)
     documents = []
     req = requests.get(f'https://www.autotrader.ca/cars/?rcp=100&rcs={i}&srt=35&prx=-1&loc=K0E%200B2&hprc=True&wcp=True&inMarket=advancedSearch', headers=headers)
