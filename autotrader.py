@@ -261,7 +261,9 @@ def upload_data(data):
 
 break_flag = False
 
-for i in list(range(58900, 0, -100)):
+# for i in list(range(58900, 0, -100)):
+for i in list(range(int(sys.argv[1]), 0, -100)):
+
     print("Index:", i)
     documents = []
     req = requests.get(f'https://www.autotrader.ca/cars/?rcp=100&rcs={i}&srt=35&prx=-1&loc=K0E%200B2&hprc=True&wcp=True&inMarket=advancedSearch', headers=headers)
