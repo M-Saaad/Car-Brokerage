@@ -215,6 +215,7 @@ def get_values(data):
     }
 
 def recursive_try(link):
+    global waiting_count
     product_req = requests.get(link, headers=headers)
     product_soup = BeautifulSoup(product_req.content, 'html.parser')
     
@@ -260,7 +261,7 @@ def upload_data(data):
 
 break_flag = False
 
-for i in list(range(int(sys.argv[1]), 0, -100)):
+for i in list(range(58900, 0, -100)):
     print("Index:", i)
     documents = []
     req = requests.get(f'https://www.autotrader.ca/cars/?rcp=100&rcs={i}&srt=35&prx=-1&loc=K0E%200B2&hprc=True&wcp=True&inMarket=advancedSearch', headers=headers)
@@ -279,6 +280,8 @@ for i in list(range(int(sys.argv[1]), 0, -100)):
             product_soup = recursive_try(link)
 
             if product_soup:
+
+                waiting_count = 0
 
                 raw_data = get_raw_data(product_soup)
 
