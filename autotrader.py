@@ -43,6 +43,8 @@ docs = list(collection.find({}, { "title": 1, "mileage": 1, "_id": 0 }))
 titles = [t['title'] for t in docs]
 mileages = [m['mileage'] for m in docs]
 
+waiting_count = 0
+
 # # Load pre-trained model (fine-tuned for car detection)
 # model = EfficientNetB0(weights='imagenet')
 
@@ -216,12 +218,16 @@ def recursive_try(link):
     product_req = requests.get(link, headers=headers)
     product_soup = BeautifulSoup(product_req.content, 'html.parser')
     
-    if len(product_soup.text) < 100:
-        print('Waiting...')
-        time.sleep(15*60)
-        product_soup = recursive_try(link)
-    
-    return product_soup
+    if waiting_count < 5:
+        if len(product_soup.text) < 100:
+            waiting_count += 1
+            print('Waiting...')
+            time.sleep(15*60)
+            product_soup = recursive_try(link)
+        
+        return product_soup
+    else:
+        return None
 
 def get_id(collection, field_value):
     
@@ -252,6 +258,8 @@ def upload_data(data):
 
     return data
 
+break_flag = False
+
 for i in list(range(int(sys.argv[1]), 0, -100)):
     print("Index:", i)
     documents = []
@@ -270,22 +278,31 @@ for i in list(range(int(sys.argv[1]), 0, -100)):
 
             product_soup = recursive_try(link)
 
-            raw_data = get_raw_data(product_soup)
+            if product_soup:
 
-            structured_data = get_values(raw_data)
+                raw_data = get_raw_data(product_soup)
 
-            if structured_data['title'] in titles and structured_data['mileage'] in mileages:
-                print('Duplicate listing:', {structured_data['title']})
-                continue
+                structured_data = get_values(raw_data)
 
-            doc = upload_data(structured_data)
+                if structured_data['title'] in titles and structured_data['mileage'] in mileages:
+                    print('Duplicate listing:', {structured_data['title']})
+                    continue
 
-            doc['source'] = link
+                doc = upload_data(structured_data)
 
-            documents.append(doc)
+                doc['source'] = link
+
+                documents.append(doc)
+            else:
+                break_flag = True
+                break
 
         except:
             print("Skipping Link:", link)
+        
+    if break_flag:
+        print("Ending...")
+        break
     
     result = collection.insert_many(documents)
 
