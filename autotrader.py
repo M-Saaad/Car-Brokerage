@@ -309,7 +309,7 @@ for i in list(range(int(sys.argv[1]), 0, -100)):
         print("Ending...")
         break
     
-    if result:
+    if documents:
         result = collection.insert_many(documents)
     else:
         print("No result found.")
