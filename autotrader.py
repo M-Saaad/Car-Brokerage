@@ -309,7 +309,10 @@ for i in list(range(int(sys.argv[1]), 0, -100)):
         print("Ending...")
         break
     
-    result = collection.insert_many(documents)
+    if result:
+        result = collection.insert_many(documents)
+    else:
+        print("No result found.")
 
     # with open(f'data/page_{i}.json', 'w') as json_file:
     #     json.dump(documents, json_file, indent=4)
