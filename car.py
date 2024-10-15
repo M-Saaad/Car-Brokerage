@@ -3,14 +3,12 @@ import io
 import gzip
 import time
 import json
-import brotli
-import requests
 import pycountry
 from datetime import datetime
-from bs4 import BeautifulSoup
 from pymongo import MongoClient
 from selenium import webdriver
 from seleniumwire import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -355,8 +353,15 @@ def get_id(col_name, field_value):
         return None
 
 # Initialize the WebDriver with Selenium Wire
-options = webdriver.ChromeOptions()
-driver = webdriver.Chrome(options=options)
+# Set up Chrome options
+chrome_options = Options()
+chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+chrome_options.add_argument("--no-sandbox")  # Bypass OS security model, needed for some servers
+chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
+chrome_options.add_argument("--remote-debugging-port=9222")  # Needed to fix DevToolsActivePort file issue
+
+# Set up the driver with the options
+driver = webdriver.Chrome(options=chrome_options)
 
 # Open the website
 driver.get('https://www.autotempest.com/results')  # Replace with the actual URL
