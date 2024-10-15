@@ -39,9 +39,25 @@ condition_collection = db['conditions']
 driver_type_collection = db['drivertypes']
 fuel_type_collection = db['fueltypes']
 transmission_collection = db['transmissions']
+makess = list(make_collection.find({}, { "name": 1}))
+models = list(model_collection.find({}, { "name": 1}))
+body_types = list(body_type_collection.find({}, { "name": 1}))
+packages = list(package_collection.find({}, { "name": 1}))
+user_ids = list(user_id_collection.find({}, { "name": 1}))
+engine_types = list(engine_type_collection.find({}, { "name": 1}))
+colors = list(color_collection.find({}, { "name": 1}))
+websites = list(website_collection.find({}, { "name": 1}))
+conditions = list(condition_collection.find({}, { "name": 1}))
+driver_types = list(driver_type_collection.find({}, { "name": 1}))
+fuel_types = list(fuel_type_collection.find({}, { "name": 1}))
+transmissions = list(transmission_collection.find({}, { "name": 1}))
 
-titles = list(listing_collection.find({}, { "title": 1, "_id": 0 }))
-titles = [t['title'] for t in titles]
+listing_docs = list(listing_collection.find({}, { "title": 1, "mileage": 1, "_id": 0 }))
+titles = [t['title'] for t in listing_docs]
+mileages = [m['mileage'] for m in listing_docs]
+auction_docs = list(auctions_collection.find({}, { "title": 1, "mileage": 1, "_id": 0 }))
+titles.extend([t['title'] for t in auction_docs])
+mileages.extend([m.get('mileage') for m in auction_docs])
 
 def get_country_name(country_code):
     try:
@@ -58,25 +74,25 @@ def get_int(string):
         return None
     
 def upload_data(data):
-    data['make'] = get_id(make_collection, {'name': data.get('make')})
-    data['model'] = get_id(model_collection, {'name': data.get('model')})
+    data['make'] = get_id('makess', data.get('make'))
+    data['model'] = get_id('models', data.get('model'))
     # data['mileage'] = int(re.sub(r'[^\d]', '', data.get('mileage')))
-    data['bodyType'] = get_id(body_type_collection, {'name': data.get('bodyType')})
-    data['condition'] = get_id(condition_collection, {'name': data.get('condition')})
-    data['transmission'] = get_id(transmission_collection, {'name': data.get('transmission')})
-    data['engineType'] = get_id(engine_type_collection, {'name': data.get('engineType')})
-    data['color'] = get_id(color_collection, {'name': data.get('color')})
+    data['bodyType'] = get_id('body_types', data.get('bodyType'))
+    data['condition'] = get_id('conditions', data.get('condition'))
+    data['transmission'] = get_id('transmissions', data.get('transmission'))
+    data['engineType'] = get_id('engine_types', data.get('engineType'))
+    data['color'] = get_id('colors', data.get('color'))
     # data['doors'] = int(re.sub(r'[^\d]', '', data.get('doors')))
-    data['website'] = get_id(website_collection, {'name': data.get('website')})
-    data['package'] = get_id(package_collection, {'name': data.get('package')})
-    data['userId'] = get_id(user_id_collection, {'name': data.get('userId')})
+    data['website'] = get_id('websites', data.get('website'))
+    data['package'] = get_id('packages', data.get('package'))
+    data['userId'] = get_id('user_ids', data.get('userId'))
 
     return data
 
 def get_raw_data():
     listing_documents = []
     auction_documents = []
-    
+
     # Get all network requests
     for i, request in enumerate(driver.requests):
         if request.url.startswith('https://www.autotempest.com/queue-results'):
@@ -106,7 +122,12 @@ def get_raw_data():
                     year = get_int(result.get('year'))
                     vin = result.get('vin')
                     source = result.get('url').replace('\\', '')
-                    website = "AutoTempest"
+                    website = "Car"
+
+                    if title in titles and mileage in mileages:
+                        print("Skipping!!!")
+                        break_flag = True
+                        break
 
                     if result.get('img'):
                         image_list = [result.get('img')]
@@ -226,18 +247,109 @@ def get_raw_data():
                             "createdAt": datetime.now(),
                             "updatedAt": datetime.now()
                         }))
+        if break_flag:
+            break
 
     return listing_documents, auction_documents
 
-def get_id(collection, field_value):
+def get_id(col_name, field_value):
+    result = None
+    global makess
+    global models
+    global body_types
+    global packages
+    global user_ids
+    global engine_types
+    global colors
+    global websites
+    global conditions
+    global driver_types
+    global fuel_types
+    global transmissions
+    global make_collection
+    global model_collection
+    global body_type_collection
+    global package_collection
+    global user_id_collection
+    global engine_type_collection
+    global color_collection
+    global website_collection
+    global condition_collection
+    global driver_type_collection
+    global fuel_type_collection
+    global transmission_collection
     
     if field_value:
-        doc = collection.find_one(field_value)
+        if col_name == 'makess':
+            col_list = makess
+        elif col_name == 'models':
+            col_list = models
+        elif col_name == 'body_types':
+            col_list = body_types
+        elif col_name == 'packages':
+            col_list = packages
+        elif col_name == 'user_ids':
+            col_list = user_ids
+        elif col_name == 'engine_types':
+            col_list = engine_types
+        elif col_name == 'colors':
+            col_list = colors
+        elif col_name == 'websites':
+            col_list = websites
+        elif col_name == 'conditions':
+            col_list = conditions
+        elif col_name == 'driver_types':
+            col_list = driver_types
+        elif col_name == 'fuel_types':
+            col_list = fuel_types
+        elif col_name == 'transmissions':
+            col_list = transmissions
 
-        if doc:
-            return doc['_id']
+        for doc in col_list:
+            if doc.get('name') == field_value:
+                result = doc
+                break
+        
+        if result:
+            return result.get('_id')
+        
         else:
-            result = collection.insert_one(field_value)
+            if col_name == 'makess':
+                result = make_collection.insert_one({'name': field_value})
+                makess = list(make_collection.find({}, { "name": 1}))
+            elif col_name == 'models':
+                result = model_collection.insert_one({'name': field_value})
+                models = list(model_collection.find({}, { "name": 1}))
+            elif col_name == 'body_types':
+                result = body_type_collection.insert_one({'name': field_value})
+                body_types = list(body_type_collection.find({}, { "name": 1}))
+            elif col_name == 'packages':
+                result = package_collection.insert_one({'name': field_value})
+                packages = list(package_collection.find({}, { "name": 1}))
+            elif col_name == 'user_ids':
+                result = user_id_collection.insert_one({'name': field_value})
+                user_ids = list(user_id_collection.find({}, { "name": 1}))
+            elif col_name == 'engine_types':
+                result = engine_type_collection.insert_one({'name': field_value})
+                engine_types = list(engine_type_collection.find({}, { "name": 1}))
+            elif col_name == 'colors':
+                result = model_collection.insert_one({'name': field_value})
+                colors = list(color_collection.find({}, { "name": 1}))
+            elif col_name == 'websites':
+                result = website_collection.insert_one({'name': field_value})
+                websites = list(website_collection.find({}, { "name": 1}))
+            elif col_name == 'conditions':
+                result = condition_collection.insert_one({'name': field_value})
+                conditions = list(condition_collection.find({}, { "name": 1}))
+            elif col_name == 'driver_types':
+                result = driver_type_collection.insert_one({'name': field_value})
+                driver_types = list(driver_type_collection.find({}, { "name": 1}))
+            elif col_name == 'fuel_types':
+                result = fuel_type_collection.insert_one({'name': field_value})
+                fuel_types = list(fuel_type_collection.find({}, { "name": 1}))
+            elif col_name == 'transmissions':
+                result = transmission_collection.insert_one({'name': field_value})
+                transmissions = list(transmission_collection.find({}, { "name": 1}))
             return result.inserted_id
     else:
         return None
@@ -270,7 +382,22 @@ sources_update_btn = WebDriverWait(driver, 10).until(
 )
 sources_update_btn.click()
 
+sort_dropdown = WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.XPATH, "//select[@id='sort']"))
+)
+sort_dropdown.click()
+newest_option = WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.XPATH, "//select[@id='sort']//option[@value='date_desc']"))
+)
+newest_option.click()
+
+listing_documents = []
+auction_documents = []
+break_flag = False
+
+del driver.requests
 button_xpath = "//button[@class='more-results'][1]"
+
 while True:
     try:
         button = WebDriverWait(driver, 10).until(
@@ -280,6 +407,7 @@ while True:
         driver.execute_script("arguments[0].scrollIntoView(true);", button)
         driver.execute_script("window.scrollBy(0, -200);")
 
+
         button.click()
         
         # # Scrape data after the button click
@@ -288,16 +416,23 @@ while True:
         # Optional: Wait for new data to load before the next interaction
         time.sleep(3)
 
+        temp_listing, temp_auction = get_raw_data()
+        listing_documents.extend(temp_listing)
+        auction_documents.extend(temp_auction)
+        del driver.requests
+
+        if break_flag:
+            break
+
     except Exception as e:
         print(f"Button is not available anymore: {e}")
         break  # Exit loop when button is gone (or exception occurs)
 
-listing_documents, auction_documents = get_raw_data()
 # listing_documents = upload_data(raw_listing)
 # auction_documents = upload_data(raw_auction)
 if listing_documents:
     listing_result = listing_collection.insert_many(listing_documents)
-    print("Lisitng results:", listing_result)
+    print("length: ", len(listing_documents))
 if auction_documents:
     auction_result = auctions_collection.insert_many(auction_documents)
-    print("Auction results:", auction_result)
+    print("length: ", len(auction_documents))
