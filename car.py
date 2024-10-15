@@ -87,7 +87,7 @@ def upload_data(data):
 
     return data
 
-def get_raw_data():
+def get_raw_data(break_flag):
     listing_documents = []
     auction_documents = []
 
@@ -248,7 +248,7 @@ def get_raw_data():
         if break_flag:
             break
 
-    return listing_documents, auction_documents
+    return break_flag, listing_documents, auction_documents
 
 def get_id(col_name, field_value):
     result = None
@@ -404,7 +404,7 @@ del driver.requests
 button_xpath = "//button[@class='more-results'][1]"
 
 while True:
-    try:
+    # try:
         button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, button_xpath))
         )
@@ -421,7 +421,7 @@ while True:
         # Optional: Wait for new data to load before the next interaction
         time.sleep(3)
 
-        temp_listing, temp_auction = get_raw_data()
+        break_flag, temp_listing, temp_auction = get_raw_data(break_flag)
         listing_documents.extend(temp_listing)
         auction_documents.extend(temp_auction)
         del driver.requests
@@ -429,9 +429,9 @@ while True:
         if break_flag:
             break
 
-    except Exception as e:
-        print(f"Button is not available anymore: {e}")
-        break  # Exit loop when button is gone (or exception occurs)
+    # except Exception as e:
+    #     print(f"Button is not available anymore: {e}")
+    #     break  # Exit loop when button is gone (or exception occurs)
 
 # listing_documents = upload_data(raw_listing)
 # auction_documents = upload_data(raw_auction)
