@@ -8,6 +8,7 @@ from datetime import datetime
 from pymongo import MongoClient
 from selenium import webdriver
 from seleniumwire import webdriver
+from bson.objectid import ObjectId
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -50,10 +51,10 @@ driver_types = list(driver_type_collection.find({}, { "name": 1}))
 fuel_types = list(fuel_type_collection.find({}, { "name": 1}))
 transmissions = list(transmission_collection.find({}, { "name": 1}))
 
-listing_docs = list(listing_collection.find({}, { "title": 1, "mileage": 1, "_id": 0 }))
+listing_docs = list(listing_collection.find({"webiste": ObjectId('670d3996b3c83649dab17ec4')}, { "title": 1, "mileage": 1, "_id": 0 }))
 titles = [t['title'] for t in listing_docs]
 mileages = [m['mileage'] for m in listing_docs]
-auction_docs = list(auctions_collection.find({}, { "title": 1, "mileage": 1, "_id": 0 }))
+auction_docs = list(auctions_collection.find({"webiste": ObjectId('670d3996b3c83649dab17ec4')}, { "title": 1, "mileage": 1, "_id": 0 }))
 titles.extend([t['title'] for t in auction_docs])
 mileages.extend([m.get('mileage') for m in auction_docs])
 
