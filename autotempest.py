@@ -22,7 +22,11 @@ headers = {
   "Connection": "keep-alive"
 }
 
-client = MongoClient('mongodb+srv://python-team:ERoksQT6kMNyiMSX@cpe.d1cwdad.mongodb.net/?retryWrites=true&w=majority&appName=cpe')
+with open('credential.json') as json_file:
+    conn_data = json.load(json_file)
+conn_string = conn_data['mongo_conn_string']
+
+client = MongoClient(conn_string)
 db = client['test']
 listing_collection = db['listings']
 auctions_collection = db['auctions']
