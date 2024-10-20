@@ -32,6 +32,7 @@ class MakeModelYear(BaseModel):
     make: str
     model: str
     year: int
+    color: str
 
 # Define the structure for the API request
 class CarRequest(BaseModel):
@@ -42,13 +43,13 @@ class MakeModelResponse(BaseModel):
     car_info: Optional[MakeModelYear]
     error: Optional[str]
 
-@app.post("/prompt-search/")
+@app.post("/prompt-search/", response_model=MakeModelResponse)
 async def search_listing(car_request: CarRequest):
     # Use OpenAI to extract car make, model, and year from the user's query
     completion = openai_client.beta.chat.completions.parse(
         model="gpt-4o-2024-08-06",
         messages=[
-            {"role": "system", "content": "You are an assistant that extracts the make, model, and year of cars from user queries."},
+            {"role": "system", "content": "You are an assistant that extracts the make, model, year and color of cars from user queries."},
             {"role": "user", "content": car_request.query},
         ],
         response_format=MakeModelResponse
@@ -60,8 +61,9 @@ async def search_listing(car_request: CarRequest):
         make = message.parsed.car_info.make
         model = message.parsed.car_info.model
         year = message.parsed.car_info.year
+        color = message.parsed.car_info.color
 
-        rich.print(f"Extracted: Make: {make}, Model: {model}, Year: {year}")
+        rich.print(f"Extracted: Make: {make}, Model: {model}, Year: {year}, Color: {color}")
 
         # Query MongoDB
         # Step 1: Find the ObjectId for the make in make_collection
@@ -80,10 +82,11 @@ async def search_listing(car_request: CarRequest):
         result = {
             "make": str(make_id),
             "model": str(model_id),
-            "year": year
+            "year": year,
+            "color":str(color)
         }
 
-        return result
+        return MakeModelResponse(car_info=MakeModelYear(**result), error=None)
     
     else:
         raise HTTPException(status_code=400, detail="Could not extract make, model, or year from the query.")
@@ -133,16 +136,6 @@ async def save_image(image: UploadFile, filename: str) -> str:
 # Route to process uploaded images and extract car information
 @app.post("/extract-car-details/", response_model=CarDetailsResponse)
 async def extract_car_details(car_detail_request: CarDetailsRequest):
-    # Save the uploaded images
-    # front_image_path = await save_image(front_image, "front_image.jpg")
-    # back_image_path = await save_image(back_image, "back_image.jpg")
-    # right_side_image_path = await save_image(right_side_image, "right_side_image.jpg")
-    # left_side_image_path = await save_image(left_side_image, "left_side_image.jpg")
-    # interior_image_path = await save_image(interior_image, "interior_image.jpg")
-    
-    # damage_part_image_path = await save_image(damage_part_image, "damage_part_image.jpg") if damage_part_image else None
-    # special_option_image_path = await save_image(special_option_image, "special_option_image.jpg") if special_option_image else None
-
     # Prepare the prompt for GPT-4 Vision
     vision_prompt = f"""
     I have uploaded images of a car. Extract the following information from the images:
@@ -229,51 +222,51 @@ async def extract_car_details(car_detail_request: CarDetailsRequest):
             },
         })
 
-    # try:
-    # Use GPT-4 Vision to analyze the images and extract information
-    completion = openai_client.beta.chat.completions.parse(
-        model="gpt-4o-2024-08-06",
-        messages=[
-            {
-                "role": "system",
-                "content": "You are an assistant that helps extract car information from images."
-            },
-            {
-                "role": "user",
-                "content": content
+    try:
+        # Use GPT-4 Vision to analyze the images and extract information
+        completion = openai_client.beta.chat.completions.parse(
+            model="gpt-4o-2024-08-06",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an assistant that helps extract car information from images."
+                },
+                {
+                    "role": "user",
+                    "content": content
+                }
+            ],
+            response_format=CarDetailsResponse
+        )
+
+
+        # Extract the parsed information
+        message = completion.choices[0].message
+
+        if message.parsed:
+
+            # Parse the extracted car details from GPT-4 Vision response
+            car_details = {
+                # You would parse the details accordingly from the response here
+                "make": message.parsed.car_details.make,
+                "model": message.parsed.car_details.model,
+                "year": message.parsed.car_details.year,
+                "vin": message.parsed.car_details.vin,
+                "type": message.parsed.car_details.type,
+                "mileage": message.parsed.car_details.mileage,
+                "description": message.parsed.car_details.description,
+                "condition": message.parsed.car_details.condition,
+                "fuel_type": message.parsed.car_details.fuel_type,
+                "cylinder": message.parsed.car_details.cylinder,
+                "engine_size": message.parsed.car_details.engine_size,
+                "registration_status": message.parsed.car_details.registration_status,
+                "color": message.parsed.car_details.color,
+                "doors": message.parsed.car_details.doors,
+                "price": message.parsed.car_details.price,
+                "features": message.parsed.car_details.features
             }
-        ],
-        response_format=CarDetailsResponse
-    )
 
-
-    # Extract the parsed information
-    message = completion.choices[0].message
-
-    if message.parsed:
-
-        # Parse the extracted car details from GPT-4 Vision response
-        car_details = {
-            # You would parse the details accordingly from the response here
-            "make": message.parsed.car_details.make,
-            "model": message.parsed.car_details.model,
-            "year": message.parsed.car_details.year,
-            "vin": message.parsed.car_details.vin,
-            "type": message.parsed.car_details.type,
-            "mileage": message.parsed.car_details.mileage,
-            "description": message.parsed.car_details.description,
-            "condition": message.parsed.car_details.condition,
-            "fuel_type": message.parsed.car_details.fuel_type,
-            "cylinder": message.parsed.car_details.cylinder,
-            "engine_size": message.parsed.car_details.engine_size,
-            "registration_status": message.parsed.car_details.registration_status,
-            "color": message.parsed.car_details.color,
-            "doors": message.parsed.car_details.doors,
-            "price": message.parsed.car_details.price,
-            "features": message.parsed.car_details.features
-        }
-
-        return CarDetailsResponse(car_details=CarDetails(**car_details), error=None)
-        
-    # except Exception as e:
-    #     return CarDetailsResponse(car_details=None, error=f"Failed to extract car details: {str(e)}")
+            return CarDetailsResponse(car_details=CarDetails(**car_details), error=None)
+            
+    except Exception as e:
+        return CarDetailsResponse(car_details=None, error=f"Failed to extract car details: {str(e)}")
