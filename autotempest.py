@@ -31,7 +31,7 @@ db = client['test']
 listing_collection = db['listings']
 auctions_collection = db['auctions']
 make_collection = db['makes']
-model_collection = db['model']
+model_collection = db['models']
 body_type_collection = db['bodytypes']
 package_collection = db['packages']
 user_id_collection = db['users']
@@ -42,18 +42,18 @@ condition_collection = db['conditions']
 driver_type_collection = db['drivertypes']
 fuel_type_collection = db['fueltypes']
 transmission_collection = db['transmissions']
-makess = list(make_collection.find({}, { "name": 1}))
-models = list(model_collection.find({}, { "name": 1}))
-body_types = list(body_type_collection.find({}, { "name": 1}))
-packages = list(package_collection.find({}, { "name": 1}))
-user_ids = list(user_id_collection.find({}, { "name": 1}))
-engine_types = list(engine_type_collection.find({}, { "name": 1}))
-colors = list(color_collection.find({}, { "name": 1}))
-websites = list(website_collection.find({}, { "name": 1}))
-conditions = list(condition_collection.find({}, { "name": 1}))
-driver_types = list(driver_type_collection.find({}, { "name": 1}))
-fuel_types = list(fuel_type_collection.find({}, { "name": 1}))
-transmissions = list(transmission_collection.find({}, { "name": 1}))
+makess = list(make_collection.find({}, { "name": 1 }))
+models = list(model_collection.find({}, { "name": 1 }))
+body_types = list(body_type_collection.find({}, { "name": 1 }))
+packages = list(package_collection.find({}, { "name": 1 }))
+user_ids = list(user_id_collection.find({}, { "name": 1 }))
+engine_types = list(engine_type_collection.find({}, { "name": 1 }))
+colors = list(color_collection.find({}, { "name": 1 }))
+websites = list(website_collection.find({}, { "name": 1 }))
+conditions = list(condition_collection.find({}, { "name": 1 }))
+driver_types = list(driver_type_collection.find({}, { "name": 1 }))
+fuel_types = list(fuel_type_collection.find({}, { "name": 1 }))
+transmissions = list(transmission_collection.find({}, { "name": 1 }))
 
 listing_docs = list(listing_collection.find({"webiste": ObjectId('670aba867da221e81fa4fff6')}, { "title": 1, "mileage": 1, "_id": 0 }))
 titles = [t['title'] for t in listing_docs]
@@ -319,40 +319,40 @@ def get_id(col_name, field_value):
         else:
             if col_name == 'makess':
                 result = make_collection.insert_one({'name': field_value})
-                makess = list(make_collection.find({}, { "name": 1}))
+                makess = list(make_collection.find({}, { "name": 1 }))
             elif col_name == 'models':
                 result = model_collection.insert_one({'name': field_value})
-                models = list(model_collection.find({}, { "name": 1}))
+                models = list(model_collection.find({}, { "name": 1 }))
             elif col_name == 'body_types':
                 result = body_type_collection.insert_one({'name': field_value})
-                body_types = list(body_type_collection.find({}, { "name": 1}))
+                body_types = list(body_type_collection.find({}, { "name": 1 }))
             elif col_name == 'packages':
                 result = package_collection.insert_one({'name': field_value})
-                packages = list(package_collection.find({}, { "name": 1}))
+                packages = list(package_collection.find({}, { "name": 1 }))
             elif col_name == 'user_ids':
                 result = user_id_collection.insert_one({'name': field_value})
-                user_ids = list(user_id_collection.find({}, { "name": 1}))
+                user_ids = list(user_id_collection.find({}, { "name": 1 }))
             elif col_name == 'engine_types':
                 result = engine_type_collection.insert_one({'name': field_value})
-                engine_types = list(engine_type_collection.find({}, { "name": 1}))
+                engine_types = list(engine_type_collection.find({}, { "name": 1 }))
             elif col_name == 'colors':
                 result = model_collection.insert_one({'name': field_value})
-                colors = list(color_collection.find({}, { "name": 1}))
+                colors = list(color_collection.find({}, { "name": 1 }))
             elif col_name == 'websites':
                 result = website_collection.insert_one({'name': field_value})
-                websites = list(website_collection.find({}, { "name": 1}))
+                websites = list(website_collection.find({}, { "name": 1 }))
             elif col_name == 'conditions':
                 result = condition_collection.insert_one({'name': field_value})
-                conditions = list(condition_collection.find({}, { "name": 1}))
+                conditions = list(condition_collection.find({}, { "name": 1 }))
             elif col_name == 'driver_types':
                 result = driver_type_collection.insert_one({'name': field_value})
-                driver_types = list(driver_type_collection.find({}, { "name": 1}))
+                driver_types = list(driver_type_collection.find({}, { "name": 1 }))
             elif col_name == 'fuel_types':
                 result = fuel_type_collection.insert_one({'name': field_value})
-                fuel_types = list(fuel_type_collection.find({}, { "name": 1}))
+                fuel_types = list(fuel_type_collection.find({}, { "name": 1 }))
             elif col_name == 'transmissions':
                 result = transmission_collection.insert_one({'name': field_value})
-                transmissions = list(transmission_collection.find({}, { "name": 1}))
+                transmissions = list(transmission_collection.find({}, { "name": 1 }))
             return result.inserted_id
     else:
         return None
