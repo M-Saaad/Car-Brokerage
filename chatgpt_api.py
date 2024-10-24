@@ -346,53 +346,53 @@ async def extract_car_details(car_detail_request: CarDetailsRequest):
             },
         })
 
-    # try:
-    # Use GPT-4 Vision to analyze the images and extract information
-    completion = openai_client.beta.chat.completions.parse(
-        model="gpt-4o-2024-08-06",
-        messages=[
-            {
-                "role": "system",
-                "content": "You are an assistant that helps extract car information from images."
-            },
-            {
-                "role": "user",
-                "content": content
+    try:
+        # Use GPT-4 Vision to analyze the images and extract information
+        completion = openai_client.beta.chat.completions.parse(
+            model="gpt-4o-2024-08-06",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an assistant that helps extract car information from images."
+                },
+                {
+                    "role": "user",
+                    "content": content
+                }
+            ],
+            response_format=ImageDetailsResponse
+        )
+
+
+        # Extract the parsed information
+        message = completion.choices[0].message
+
+        if message.parsed:
+
+            # Parse the extracted car details from GPT-4 Vision response
+            car_details = {
+                # You would parse the details accordingly from the response here
+                'make': get_id('make', message.parsed.car_details.make),
+                'model': get_id('model', message.parsed.car_details.model),
+                'title': message.parsed.car_details.title,
+                'description': message.parsed.car_details.description,
+                'year': message.parsed.car_details.year,
+                'bodyType': get_id('bodyType', message.parsed.car_details.bodyType),
+                'condition': get_id('condition', message.parsed.car_details.condition),
+                'assembly': get_id('assembly', message.parsed.car_details.assembly),
+                'driverType': get_id('driverType', message.parsed.car_details.driverType),
+                'transmission': get_id('transmission', message.parsed.car_details.transmission),
+                'cylinder': message.parsed.car_details.cylinder,
+                'engineSize': message.parsed.car_details.engineSize,
+                'engineType': get_id('engineType', message.parsed.car_details.engineType),
+                'color': message.parsed.car_details.color,
+                'doors': message.parsed.car_details.doors,
+                'seats': message.parsed.car_details.seats,
+                'price': message.parsed.car_details.price,
+                'features': message.parsed.car_details.features
             }
-        ],
-        response_format=ImageDetailsResponse
-    )
 
-
-    # Extract the parsed information
-    message = completion.choices[0].message
-
-    if message.parsed:
-
-        # Parse the extracted car details from GPT-4 Vision response
-        car_details = {
-            # You would parse the details accordingly from the response here
-            'make': get_id('make', message.parsed.car_details.make),
-            'model': get_id('model', message.parsed.car_details.model),
-            'title': message.parsed.car_details.title,
-            'description': message.parsed.car_details.description,
-            'year': message.parsed.car_details.year,
-            'bodyType': get_id('bodyType', message.parsed.car_details.bodyType),
-            'condition': get_id('condition', message.parsed.car_details.condition),
-            'assembly': get_id('assembly', message.parsed.car_details.assembly),
-            'driverType': get_id('driverType', message.parsed.car_details.driverType),
-            'transmission': get_id('transmission', message.parsed.car_details.transmission),
-            'cylinder': message.parsed.car_details.cylinder,
-            'engineSize': message.parsed.car_details.engineSize,
-            'engineType': get_id('engineType', message.parsed.car_details.engineType),
-            'color': message.parsed.car_details.color,
-            'doors': message.parsed.car_details.doors,
-            'seats': message.parsed.car_details.seats,
-            'price': message.parsed.car_details.price,
-            'features': message.parsed.car_details.features
-        }
-
-        return ImageDetailsResponse(car_details=ImageCarDetails(**car_details), error=None)
+            return ImageDetailsResponse(car_details=ImageCarDetails(**car_details), error=None)
             
-    # except Exception as e:
-    #     return ImageDetailsResponse(car_details=None, error=f"Failed to extract car details: {str(e)}")
+    except Exception as e:
+        return ImageDetailsResponse(car_details=None, error=f"Failed to extract car details: {str(e)}")
