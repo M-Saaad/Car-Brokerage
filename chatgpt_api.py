@@ -84,6 +84,8 @@ def get_id(col_name, field_value):
             col_list = engineType_list
         elif col_name == 'website':
             col_list = website_list
+        
+        print(col_name)
 
         for doc in col_list:
             if doc.get('name') == field_value:
@@ -130,6 +132,32 @@ class SearchCarDetailsResponse(BaseModel):
 # Define the structure for the API request
 class SearchCarRequest(BaseModel):
     query: str
+
+# Define the structure to hold the car's extracted information
+class ImageCarDetails(BaseModel):
+    make: str
+    model: str
+    title: Optional[str]
+    description: Optional[str]
+    year: Optional[int]
+    bodyType: Optional[str]
+    condition: Optional[str]
+    assembly: Optional[str]
+    driverType: Optional[str]
+    transmission: Optional[str]
+    cylinder: Optional[int]
+    engineSize: Optional[str]
+    engineType: Optional[str]
+    color: Optional[str]
+    doors: Optional[int]
+    seats: Optional[int]
+    price: Optional[int]
+    features: Optional[List[str]]
+
+# Define the structure for the response
+class ImageDetailsResponse(BaseModel):
+    car_details: Optional[ImageCarDetails]
+    error: Optional[str]
 
 # Define the structure for the request
 class CarDetailsRequest(BaseModel):
@@ -215,148 +243,156 @@ async def search_listing(car_request: SearchCarRequest):
     else:
         raise HTTPException(status_code=400, detail="Could not extract make, model, or year from the query.")
 
-# Helper function to save uploaded files temporarily
-async def save_image(image: UploadFile, filename: str) -> str:
-    file_path = f"/tmp/{filename}"
-    async with aiofiles.open(file_path, 'wb') as out_file:
-        while content := await image.read(1024):
-            await out_file.write(content)
-    return file_path
+# # Helper function to save uploaded files temporarily
+# async def save_image(image: UploadFile, filename: str) -> str:
+#     file_path = f"/tmp/{filename}"
+#     async with aiofiles.open(file_path, 'wb') as out_file:
+#         while content := await image.read(1024):
+#             await out_file.write(content)
+#     return file_path
 
-# # Route to process uploaded images and extract car information
-# @app.post("/extract-car-details/", response_model=CarDetailsResponse)
-# async def extract_car_details(car_detail_request: CarDetailsRequest):
-#     # Prepare the prompt for GPT-4 Vision
-#     vision_prompt = f"""
-#     I have provided images of a car. Please analyze these images and extract all relevant information based on the details I am seeking below. Be as thorough as possible and infer details from the images wherever applicable:
-#     - Make: (Car manufacturer)
-#     - Model: (Car model)
-#     - Year: (Year of manufacture)
-#     - VIN: (Vehicle Identification Number, if visible)
-#     - Car type: (e.g., sedan, SUV, etc.)
-#     - Mileage: (Odometer reading or estimation)
-#     - Description: (A brief summary or description for a selling post)
-#     - Condition: (Analyzed condition based on the images)
-#     - Fuel type: (e.g., gasoline, diesel, electric)
-#     - Number of cylinders: (Engine configuration)
-#     - Engine size: (If visible or inferable)
-#     - Registration status: (Visible details about registration)
-#     - Color: (Main exterior color)
-#     - Number of doors: (e.g., 2, 4)
-#     - Price: (Suggested selling price in USD based on car's condition and details)
-#     - Features: (Notable features such as sunroof, navigation system, leather seats, etc.)
+# Route to process uploaded images and extract car information
+@app.post("/extract-car-details/", response_model=ImageDetailsResponse)
+async def extract_car_details(car_detail_request: CarDetailsRequest):
+    # Prepare the prompt for GPT-4 Vision
+    vision_prompt = f"""
+        I am providing images of a car, and I would like you to analyze these images to extract and infer as much detailed information as possible. Below are the specific details I am looking for. Please provide thorough and accurate information, making inferences where applicable from the provided images:
 
-#     The images you will get in following sequence:
-#     - Front view:
-#     - Back view:
-#     - Right side view:
-#     - Left side view:
-#     - Interior:
-#     - Damage part (optional):
-#     - Special option part (optional):
-#     """
+        - Make: (Manufacturer of the car, e.g., Toyota, Honda, etc.)
+        - Model: (Specific car model, e.g., Corolla, Model S, etc.)
+        - Year: (Year of manufacture, if visible or inferable)
+        - Title: (A concise, attractive title suitable for a selling post)
+        - Description: (A brief and compelling description for listing the car for sale)
+        - Body Type: (Car type, e.g., Sedan, SUV, Compact, etc.)
+        - Condition: (Assessed condition based on the images—e.g., excellent, good, used, etc.)
+        - Assembly: (Whether the car is locally assembled or imported)
+        - Driver Type: (Left-hand or right-hand drive)
+        - Transmission: (Type of transmission—e.g., Automatic, Manual, 5-Speed Manual, etc.)
+        - Engine Cylinder: (Number of cylinders, if visible or inferred from model)
+        - Engine Size: (Engine capacity, e.g., 2.0L, if known or inferred)
+        - Engine Type: (Fuel type, e.g., Petrol, Diesel, Hybrid, Electric, etc.)
+        - Exterior Color: (The car's color, as visible in the images)
+        - Number of Doors: (E.g., 2-door, 4-door, based on images or model)
+        - Seats: (Number of seats, either visible or inferred from the car type/model)
+        - Price: (A suggested selling price in USD based on the car's details and condition)
+        - Features: (Any additional or special features—e.g., sunroof, navigation system, leather seats, etc.)
 
-#     content = [
-#         {"type": "text", "text": vision_prompt},
-#         {
-#             "type": "image_url",
-#             "image_url": {
-#                 "url": car_detail_request.front_image,
-#                 "detail": "low"
-#             },
-#         },
-#         {
-#             "type": "image_url",
-#             "image_url": {
-#                 "url": car_detail_request.back_image,
-#                 "detail": "low"
-#             },
-#         },
-#         {
-#             "type": "image_url",
-#             "image_url": {
-#                 "url": car_detail_request.right_side_image,
-#                 "detail": "low"
-#             },
-#         },
-#         {
-#             "type": "image_url",
-#             "image_url": {
-#                 "url": car_detail_request.left_side_image,
-#                 "detail": "low"
-#             },
-#         },
-#         {
-#             "type": "image_url",
-#             "image_url": {
-#                 "url": car_detail_request.interior_image,
-#                 "detail": "low"
-#             },
-#         }
-#     ]
+        The images are provided in the following sequence:
+        - Front view
+        - Back view
+        - Right side view
+        - Left side view
+        - Interior
+        - Damage part (optional)
+        - Special option part (optional)
 
-#     if car_detail_request.damage_part_image:
-#         content.append({
-#             "type": "image_url",
-#             "image_url": {
-#                 "url": car_detail_request.damage_part_image,
-#                 "detail": "low"
-#             },
-#         })
-#     if car_detail_request.special_option_image:
-#         content.append({
-#             "type": "image_url",
-#             "image_url": {
-#                 "url": car_detail_request.special_option_image,
-#                 "detail": "low"
-#             },
-#         })
-
-#     try:
-#         # Use GPT-4 Vision to analyze the images and extract information
-#         completion = openai_client.beta.chat.completions.parse(
-#             model="gpt-4o-2024-08-06",
-#             messages=[
-#                 {
-#                     "role": "system",
-#                     "content": "You are an assistant that helps extract car information from images."
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": content
-#                 }
-#             ],
-#             response_format=CarDetailsResponse
-#         )
+        Please ensure all relevant information is included, and make logical inferences wherever necessary.
+    """
 
 
-#         # Extract the parsed information
-#         message = completion.choices[0].message
+    content = [
+        {"type": "text", "text": vision_prompt},
+        {
+            "type": "image_url",
+            "image_url": {
+                "url": car_detail_request.front_image,
+                "detail": "low"
+            },
+        },
+        {
+            "type": "image_url",
+            "image_url": {
+                "url": car_detail_request.back_image,
+                "detail": "low"
+            },
+        },
+        {
+            "type": "image_url",
+            "image_url": {
+                "url": car_detail_request.right_side_image,
+                "detail": "low"
+            },
+        },
+        {
+            "type": "image_url",
+            "image_url": {
+                "url": car_detail_request.left_side_image,
+                "detail": "low"
+            },
+        },
+        {
+            "type": "image_url",
+            "image_url": {
+                "url": car_detail_request.interior_image,
+                "detail": "low"
+            },
+        }
+    ]
 
-#         if message.parsed:
+    if car_detail_request.damage_part_image:
+        content.append({
+            "type": "image_url",
+            "image_url": {
+                "url": car_detail_request.damage_part_image,
+                "detail": "low"
+            },
+        })
+    if car_detail_request.special_option_image:
+        content.append({
+            "type": "image_url",
+            "image_url": {
+                "url": car_detail_request.special_option_image,
+                "detail": "low"
+            },
+        })
 
-#             # Parse the extracted car details from GPT-4 Vision response
-#             car_details = {
-#                 # You would parse the details accordingly from the response here
-#                 "make": message.parsed.car_details.make,
-#                 "model": message.parsed.car_details.model,
-#                 "year": message.parsed.car_details.year,
-#                 "vin": message.parsed.car_details.vin,
-#                 "type": message.parsed.car_details.type,
-#                 "mileage": message.parsed.car_details.mileage,
-#                 "description": message.parsed.car_details.description,
-#                 "condition": message.parsed.car_details.condition,
-#                 "fuel_type": message.parsed.car_details.fuel_type,
-#                 "cylinder": message.parsed.car_details.cylinder,
-#                 "engine_size": message.parsed.car_details.engine_size,
-#                 "registration_status": message.parsed.car_details.registration_status,
-#                 "color": message.parsed.car_details.color,
-#                 "doors": message.parsed.car_details.doors,
-#                 "price": message.parsed.car_details.price,
-#                 "features": message.parsed.car_details.features
-#             }
+    # try:
+    # Use GPT-4 Vision to analyze the images and extract information
+    completion = openai_client.beta.chat.completions.parse(
+        model="gpt-4o-2024-08-06",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are an assistant that helps extract car information from images."
+            },
+            {
+                "role": "user",
+                "content": content
+            }
+        ],
+        response_format=ImageDetailsResponse
+    )
 
-#             return CarDetailsResponse(car_details=CarDetails(**car_details), error=None)
+
+    # Extract the parsed information
+    message = completion.choices[0].message
+
+    if message.parsed:
+
+        # Parse the extracted car details from GPT-4 Vision response
+        car_details = {
+            # You would parse the details accordingly from the response here
+            'make': get_id('make', message.parsed.car_details.make),
+            'model': get_id('model', message.parsed.car_details.model),
+            'title': message.parsed.car_details.title,
+            'description': message.parsed.car_details.description,
+            'year': message.parsed.car_details.year,
+            'bodyType': get_id('bodyType', message.parsed.car_details.bodyType),
+            'condition': get_id('condition', message.parsed.car_details.condition),
+            'assembly': get_id('assembly', message.parsed.car_details.assembly),
+            'driverType': get_id('driverType', message.parsed.car_details.driverType),
+            'transmission': get_id('transmission', message.parsed.car_details.transmission),
+            'cylinder': message.parsed.car_details.cylinder,
+            'engineSize': message.parsed.car_details.engineSize,
+            'engineType': get_id('engineType', message.parsed.car_details.engineType),
+            'color': message.parsed.car_details.color,
+            'doors': message.parsed.car_details.doors,
+            'seats': message.parsed.car_details.seats,
+            'price': message.parsed.car_details.price,
+            'features': message.parsed.car_details.features
+        }
+
+        return ImageDetailsResponse(car_details=ImageCarDetails(**car_details), error=None)
             
-#     except Exception as e:
-#         return CarDetailsResponse(car_details=None, error=f"Failed to extract car details: {str(e)}")
+    # except Exception as e:
+    #     return ImageDetailsResponse(car_details=None, error=f"Failed to extract car details: {str(e)}")
