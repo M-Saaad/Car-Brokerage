@@ -22,7 +22,7 @@ headers = {
   "Connection": "keep-alive"
 }
 
-with open('Car-Brokeragr/credential.json') as json_file:
+with open('credential.json') as json_file:
     conn_data = json.load(json_file)
 conn_string = conn_data['mongo_conn_string']
 
