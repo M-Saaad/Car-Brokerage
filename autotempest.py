@@ -409,7 +409,7 @@ del driver.requests
 button_xpath = "//button[@class='more-results'][1]"
 
 while True:
-    # try:
+    try:
         button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, button_xpath))
         )
@@ -434,9 +434,9 @@ while True:
         if break_flag:
             break
 
-    # except Exception as e:
-    #     print(f"Button is not available anymore: {e}")
-    #     break  # Exit loop when button is gone (or exception occurs)
+    except Exception as e:
+        print(f"Button is not available anymore: {e}")
+        break  # Exit loop when button is gone (or exception occurs)
 
 # listing_documents = upload_data(raw_listing)
 # auction_documents = upload_data(raw_auction)
