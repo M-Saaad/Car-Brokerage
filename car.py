@@ -22,7 +22,7 @@ headers = {
   "Connection": "keep-alive"
 }
 
-with open('Car-Brokeragr/credential.json') as json_file:
+with open('credential.json') as json_file:
     conn_data = json.load(json_file)
 conn_string = conn_data['mongo_conn_string']
 
@@ -385,8 +385,6 @@ for source in sources[1:]:
         EC.element_to_be_clickable((By.XPATH, indicator_div_xpath))
     )
     indicator_div.click()
-
-print("DOPPasdasdasdasdasdasdNE")
 
 sources_update_btn_xpath = "//button[@class='update-results'][1]"
 sources_update_btn = WebDriverWait(driver, 10).until(
