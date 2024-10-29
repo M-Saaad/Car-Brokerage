@@ -19,7 +19,7 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-with open('Car-Brokerage/credential.json') as json_file:
+with open('credential.json') as json_file:
     conn_data = json.load(json_file)
 conn_string = conn_data['mongo_conn_string']
 
