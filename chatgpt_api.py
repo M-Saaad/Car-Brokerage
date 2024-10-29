@@ -48,7 +48,7 @@ engineType_list = list(engineType_collection.find({}, { 'name': 1 }))
 website_list = list(website_collection.find({}, { 'name': 1 }))
 
 # OpenAI API key
-with open('Car-Brokerage/credential.json') as json_file:
+with open('credential.json') as json_file:
     cred_data = json.load(json_file)
 api_key = cred_data['open_ai_key']
 openai_client = OpenAI(api_key=api_key)
