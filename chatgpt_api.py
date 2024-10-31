@@ -55,6 +55,8 @@ openai_client = OpenAI(api_key=api_key)
 
 def get_id(col_name, field_value):
     result = None
+    global makess
+    global models
     global make_list
     global model_list
     global bodyType_list
@@ -84,8 +86,6 @@ def get_id(col_name, field_value):
             col_list = engineType_list
         elif col_name == 'website':
             col_list = website_list
-        
-        print(col_name)
 
         for doc in col_list:
             if doc.get('name') == field_value:
@@ -94,9 +94,18 @@ def get_id(col_name, field_value):
         
         if result:
             return str(result.get('_id'))
-        else:
-            return None
 
+        else:
+            if col_name == 'make':
+                result = make_collection.insert_one({'name': field_value})
+                makess = list(make_collection.find({}, { "name": 1 }))
+                return result.inserted_id
+            elif col_name == 'model':
+                result = model_collection.insert_one({'name': field_value})
+                models = list(model_collection.find({}, { "name": 1 }))
+                return result.inserted_id
+            return None
+    
     else:
         return None
 
@@ -165,9 +174,9 @@ class CarDetailsRequest(BaseModel):
     back_image: str
     right_side_image: str
     left_side_image: str
-    interior_image: str
-    damage_part_image: Optional[str]
-    special_option_image: Optional[str]
+    interior_image: List[str]
+    damage_part_image: Optional[List[str]]
+    special_option_image: Optional[List[str]]
 
 @app.post("/prompt-search/", response_model=SearchCarDetailsResponse)
 async def search_listing(car_request: SearchCarRequest):
@@ -259,9 +268,19 @@ async def search_listing(car_request: SearchCarRequest):
 @app.post("/extract-car-details/", response_model=ImageDetailsResponse)
 async def extract_car_details(car_detail_request: CarDetailsRequest):
     try:
+        sub_interior_prompt = ''
+        sub_damage_prompt = ''
+        sub_special_prompt = ''
+
+        sub_interior_prompt = f'- Interior ({len(car_detail_request.interior_image)} images)'
+        if len(car_detail_request.special_option_image) > 0:
+            sub_damage_prompt = f'- Special Option ({len(car_detail_request.special_option_image)} images)'
+        if len(car_detail_request.damage_part_image) > 0:
+            sub_special_prompt = f'- Damage part ({len(car_detail_request.damage_part_image)} images)'
+
         # Prepare the prompt for GPT-4 Vision
         vision_prompt = f"""
-            I am providing images of a car, and I would like you to analyze these images to extract and infer as much detailed information as possible. Below are the specific details I am looking for. Please provide thorough and accurate information, making inferences where applicable from the provided images:
+            I am providing images of a car for analysis. Your task is to extract and infer detailed information from these images. Please prioritize identifying the make and model, while also providing the following details:
 
             - Make: (Manufacturer of the car, e.g., Toyota, Honda, etc.)
             - Model: (Specific car model, e.g., Corolla, Model S, etc.)
@@ -287,16 +306,16 @@ async def extract_car_details(car_detail_request: CarDetailsRequest):
             - Back view
             - Right side view
             - Left side view
-            - Interior
-            - Damage part (optional 5 images)
-            - Special option part (optional 5 images)
+            {sub_interior_prompt}
+            {sub_special_prompt}
+            {sub_damage_prompt}
 
-            Please ensure all relevant information is included, and make logical inferences wherever necessary.
+            Ensure to capture all relevant information and make logical inferences wherever necessary, with a strong emphasis on identifying the make and model.
         """
 
 
         content = [
-            {"type": "text", "text": vision_prompt},
+            {"type": "text", "text": str(vision_prompt)},
             {
                 "type": "image_url",
                 "image_url": {
@@ -324,32 +343,37 @@ async def extract_car_details(car_detail_request: CarDetailsRequest):
                     "url": car_detail_request.left_side_image,
                     "detail": "low"
                 },
-            },
-            {
-                "type": "image_url",
-                "image_url": {
-                    "url": car_detail_request.interior_image,
-                    "detail": "low"
-                },
             }
         ]
 
-        if car_detail_request.damage_part_image:
+        for url in car_detail_request.interior_image:
             content.append({
                 "type": "image_url",
                 "image_url": {
-                    "url": car_detail_request.damage_part_image,
+                    "url": url,
                     "detail": "low"
                 },
             })
+
         if car_detail_request.special_option_image:
-            content.append({
-                "type": "image_url",
-                "image_url": {
-                    "url": car_detail_request.special_option_image,
-                    "detail": "low"
-                },
-            })
+            for url in car_detail_request.special_option_image:
+                content.append({
+                    "type": "image_url",
+                    "image_url": {
+                        "url": url,
+                        "detail": "low"
+                    },
+                })
+        
+        if car_detail_request.damage_part_image:
+            for url in car_detail_request.damage_part_image:
+                content.append({
+                    "type": "image_url",
+                    "image_url": {
+                        "url": url,
+                        "detail": "low"
+                    },
+                })
 
         try:
             # Use GPT-4 Vision to analyze the images and extract information
