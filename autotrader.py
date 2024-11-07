@@ -264,8 +264,8 @@ def upload_data(data):
 
 break_flag = False
 
-# for i in list(range(58900, 0, -100)):
-for i in list(range(int(sys.argv[1]), 0, -100)):
+for i in list(range(0, 1000, 100)):
+# for i in list(range(int(sys.argv[1]), 0, -100)):
 
     print("Index:", i)
     documents = []
@@ -294,7 +294,8 @@ for i in list(range(int(sys.argv[1]), 0, -100)):
 
                 if structured_data['title'] in titles and structured_data['mileage'] in mileages:
                     print('Duplicate listing:', {structured_data['title']})
-                    continue
+                    break_flag = True
+                    break
 
                 doc = upload_data(structured_data)
 
