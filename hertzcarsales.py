@@ -5,6 +5,50 @@ from datetime import datetime
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
+import requests
+
+# Payload data
+payload = {
+    "siteId": "hertzcarsales",
+    "locale": "en_US",
+    "device": "DESKTOP",
+    "flags": {
+        "vcda-js-environment": "live",
+        "ws-scripts-concurrency-limits-concurrency": 16,
+        "ws-scripts-concurrency-limits-enabled": True,
+        "ws-scripts-concurrency-limits-queue": 16,
+        "ws-scripts-inline-css": True,
+        "enable-account-data-distributor-fetch-ws-inv-data": False,
+        "enable-client-side-geolocation-ws-inv-data": False,
+        "srp-test-package-data": 0,
+        "srp-track-fetch-resource-timing": False,
+        "ws-inv-data-fetch-retries": 2,
+        "ws-inv-data-fetch-timeout": 5000,
+        "ws-inv-data-location-service-fetch-retries": 2,
+        "ws-inv-data-location-service-fetch-timeout": 3000,
+        "ws-inv-data-preload-inventory": True,
+        "ws-inv-data-spellcheck-proxy-timeout": 5000,
+        "ws-inv-data-spellcheck-server-retries": 0,
+        "ws-inv-data-spellcheck-server-timeout": 1500,
+        "ws-inv-data-use-wis": True,
+        "ws-inv-data-wis-fetch-timeout": 5000,
+        "ws-itemlist-model-version": "v1",
+        "ws-itemlist-service-version": "v5",
+        "wsm-account-data-distributor-retries": 2,
+        "wsm-account-data-distributor-timeout": 50
+    },
+    "includePricing": True,
+    "inventoryParameters": {
+        "geoRadius": ["0"],
+        "geoZip": [""],
+        "start": ["0"]
+    },
+    "pageAlias": "INVENTORY_LISTING_GRID_AUTO_ALL",
+    "pageId": "hertzcarsales_SITEBUILDER_INVENTORY_SEARCH_RESULTS_AUTO_USED_V1_196",
+    "widgetName": "ws-inv-data",
+    "windowId": "inventory-data-bus1"
+}
+
 with open('credential.json') as json_file:
     conn_data = json.load(json_file)
 conn_string = conn_data['mongo_conn_string']
@@ -37,7 +81,7 @@ driver_types = list(driver_type_collection.find({}, { "name": 1 }))
 fuel_types = list(fuel_type_collection.find({}, { "name": 1 }))
 transmissions = list(transmission_collection.find({}, { "name": 1 }))
 
-listing_docs = list(listing_collection.find({"website": ObjectId('672f45993b775f8c9cfa9241')}, { "title": 1, "mileage": 1, "_id": 0 }))
+listing_docs = list(listing_collection.find({"website": ObjectId('672f377ed2b0a68386cdf184')}, { "title": 1, "mileage": 1, "_id": 0 }))
 titles = []
 mileages = []
 
@@ -75,7 +119,7 @@ def get_raw_data(data):
     if data:
         for doc in data['inventory']:
             title = ' '.join(doc.get('title'))
-            
+
             mileage = None
             engine = None
             transmission = None
@@ -123,8 +167,8 @@ def get_raw_data(data):
                 'imageUrls': [img['uri'] for img in doc['images']],
                 'country': 'United States',
                 'city': city if city else None,
-                'website': 'Avis Car Sales',
-                'source': 'https://www.aviscarsales.com' + doc.get('link'),
+                'website': 'Hertz Car Sales',
+                'source': 'https://www.hertzcarsales.com' + doc.get('link'),
                 'views': 0,
                 'likes': 0,
                 'status': 'Active',
@@ -246,8 +290,9 @@ def get_id(col_name, field_value):
 listing_documents = []
 
 while (True):
-    url = f"https://www.aviscarsales.com/apis/widget/INVENTORY_LISTING_DEFAULT_AUTO_USED:inventory-data-bus1/getInventory?geoZip=&geoRadius=0&start={count}"
-    res = requests.get(url)
+    url = "https://www.hertzcarsales.com/api/widget/ws-inv-data/getInventory"
+    payload['inventoryParameters']['start'] = [str(count)]
+    res = requests.post(url, json=payload)
     
     if res.status_code == 200:
         res_data = res.json()
