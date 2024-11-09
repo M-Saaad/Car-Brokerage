@@ -78,17 +78,31 @@ def get_raw_data(soup):
         if 'if (!window[\'ngVdpModel\']) {\r\n        window[\'ngVdpModel\']' in script.text:
             json_string = script.text.strip()
             break
-    
-    pattern = r"window\['([^']+)'\] = (\{.*?\});"
+
+    # Updated pattern to capture the JSON assignment statement
+    pattern = r"window\['([^']+)'\] = (\{.*);"
     matches = re.findall(pattern, json_string, re.DOTALL)
 
     for key, json_str in matches:
+        # Trim JSON data up to the matching bracket
+        bracket_count = 0
+        for i, char in enumerate(json_str):
+            if char == '{':
+                bracket_count += 1
+            elif char == '}':
+                bracket_count -= 1
+                # Stop when all opening brackets are matched
+                if bracket_count == 0:
+                    json_str = json_str[:i+1]
+                    break
+
         try:
-            # Convert the string into a JSON object
+            # Attempt to parse the cleaned JSON string
             json_obj = json.loads(json_str)
             raw_values[key] = json_obj
         except json.JSONDecodeError as e:
             print(f"Error decoding JSON for {key}: {e}")
+            # Optionally handle or log the malformed JSON here
 
     return raw_values
 
