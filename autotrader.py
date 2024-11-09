@@ -10,6 +10,7 @@ import tensorflow as tf
 from bs4 import BeautifulSoup
 from datetime import datetime
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 # from tensorflow.keras.preprocessing import image
 # from sklearn.metrics.pairwise import cosine_similarity
 # from tensorflow.keras.applications import EfficientNetB0
@@ -42,9 +43,14 @@ driver_type_collection = db['drivertypes']
 fuel_type_collection = db['fueltypes']
 transmission_collection = db['transmissions']
 
-docs = list(collection.find({}, { "title": 1, "mileage": 1, "_id": 0 }))
-titles = [t['title'] for t in docs]
-mileages = [m['mileage'] for m in docs]
+listing_docs = list(collection.find({"webiste": ObjectId('66ca13d8bba544259919833a')}, { "title": 1, "mileage": 1, "_id": 0 }))
+titles = []
+mileages = []
+
+for d in listing_docs:
+    if d.get('title') and d.get('mileage'):
+        titles.append(d.get('title'))
+        mileages.append(d.get('mileage'))
 
 waiting_count = 0
 
