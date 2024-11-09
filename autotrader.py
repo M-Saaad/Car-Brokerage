@@ -43,7 +43,7 @@ driver_type_collection = db['drivertypes']
 fuel_type_collection = db['fueltypes']
 transmission_collection = db['transmissions']
 
-listing_docs = list(collection.find({"webiste": ObjectId('66ca13d8bba544259919833a')}, { "title": 1, "mileage": 1, "_id": 0 }))
+listing_docs = list(collection.find({"website": ObjectId('66ca13d8bba544259919833a')}, { "title": 1, "mileage": 1, "_id": 0 }))
 titles = []
 mileages = []
 

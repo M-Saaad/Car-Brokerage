@@ -55,7 +55,7 @@ driver_types = list(driver_type_collection.find({}, { "name": 1 }))
 fuel_types = list(fuel_type_collection.find({}, { "name": 1 }))
 transmissions = list(transmission_collection.find({}, { "name": 1 }))
 
-listing_docs = list(listing_collection.find({"webiste": ObjectId('670aba867da221e81fa4fff6')}, { "title": 1, "mileage": 1, "_id": 0 }))
+listing_docs = list(listing_collection.find({"website": ObjectId('670aba867da221e81fa4fff6')}, { "title": 1, "mileage": 1, "_id": 0 }))
 titles = []
 mileages = []
 
@@ -63,7 +63,7 @@ for d in listing_docs:
     if d.get('title') and d.get('mileage'):
         titles.append(d.get('title'))
         mileages.append(d.get('mileage'))
-auction_docs = list(auctions_collection.find({"webiste": ObjectId('670aba867da221e81fa4fff6')}, { "title": 1, "mileage": 1, "_id": 0 }))
+auction_docs = list(auctions_collection.find({"website": ObjectId('670aba867da221e81fa4fff6')}, { "title": 1, "mileage": 1, "_id": 0 }))
 titles.extend([t['title'] for t in auction_docs])
 mileages.extend([m.get('mileage') for m in auction_docs])
 
