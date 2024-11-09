@@ -361,6 +361,7 @@ def get_id(col_name, field_value):
 # Set up Chrome options
 chrome_options = Options()
 chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+chrome_options.add_argument('--no-proxy-server')
 chrome_options.add_argument("--no-sandbox")  # Bypass OS security model, needed for some servers
 chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
 chrome_options.add_argument("--remote-debugging-port=9222")  # Needed to fix DevToolsActivePort file issue
