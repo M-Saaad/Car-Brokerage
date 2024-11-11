@@ -367,6 +367,8 @@ def get_id(col_name, field_value):
 chrome_options = Options()
 chrome_options.add_argument("--headless")  # Run Chrome in headless mode
 chrome_options.add_argument("--no-sandbox")  # Bypass OS security model, needed for some servers
+chrome_options.add_argument('--no-proxy-server')  # Disable proxy
+chrome_options.add_argument('--proxy-bypass-list=*')  # Bypass any set proxy
 chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
 chrome_options.add_argument("--remote-debugging-port=9222")  # Needed to fix DevToolsActivePort file issue
 
@@ -374,7 +376,13 @@ chrome_options.add_argument("--remote-debugging-port=9222")  # Needed to fix Dev
 driver = webdriver.Chrome(options=chrome_options)
 
 # Open the website
-driver.get('https://www.autotempest.com/results')  # Replace with the actual URL
+driver.get('https://www.autotempest.com/results')
+
+time.sleep(5)
+
+driver.delete_all_cookies()
+
+print("Done")
 
 sources_btn_xpath = "//button[@id='change-sources-tippy'][1]"
 button = WebDriverWait(driver, 10).until(
