@@ -375,10 +375,10 @@ chrome_options.add_argument("--remote-debugging-port=9222")  # Needed to fix Dev
 # Set up the driver with the options
 driver = webdriver.Chrome(options=chrome_options)
 
+driver.set_page_load_timeout(600)
+
 # Open the website
 driver.get('https://www.autotempest.com/results')
-
-time.sleep(5)
 
 driver.delete_all_cookies()
 
