@@ -379,12 +379,8 @@ chrome_options.add_argument("--disable-dev-shm-usage")
 # Set up the driver with the options
 driver = webdriver.Chrome(options=chrome_options)
 
-driver.set_page_load_timeout(600)
-
 # Open the website
 driver.get('https://www.autotempest.com/results')
-
-driver.delete_all_cookies()
 
 print("Done")
 
