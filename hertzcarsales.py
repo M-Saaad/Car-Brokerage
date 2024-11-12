@@ -116,7 +116,7 @@ def upload_data(data):
 
 def get_raw_data(data):
     listing_documents = []
-    if data:
+    if data.get('inventory'):
         for doc in data['inventory']:
             title = ' '.join(doc.get('title'))
 
