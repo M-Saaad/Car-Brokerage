@@ -35,6 +35,7 @@ assembly_collection = db['assemblies']
 driverType_collection = db['drivertypes']
 transmission_collection = db['transmission']
 engineType_collection = db['enginetypes']
+color_collection = db['colors']
 website_collection = db['website']
 
 make_list = list(make_collection.find({}, { 'name': 1 }))
@@ -45,6 +46,7 @@ assembly_list = list(assembly_collection.find({}, { 'name': 1 }))
 driverType_list = list(driverType_collection.find({}, { 'name': 1 }))
 transmission_list = list(transmission_collection.find({}, { 'name': 1 }))
 engineType_list = list(engineType_collection.find({}, { 'name': 1 }))
+color_list = list(color_collection.find({}, { 'name': 1 }))
 website_list = list(website_collection.find({}, { 'name': 1 }))
 
 # OpenAI API key
@@ -65,6 +67,7 @@ def get_id(col_name, field_value):
     global driverType_list
     global transmission_list
     global engineType_list
+    global color_list
     global website_list
     
     if field_value:
@@ -84,6 +87,8 @@ def get_id(col_name, field_value):
             col_list = transmission_list
         elif col_name == 'engineType':
             col_list = engineType_list
+        elif col_name == 'color':
+            col_list = color_list
         elif col_name == 'website':
             col_list = website_list
 
@@ -238,7 +243,7 @@ async def search_listing(car_request: SearchCarRequest):
                 'engineSize': message.parsed.car_details.engineSize,
                 'engineType': get_id('engineType', message.parsed.car_details.engineType),
                 'registrationStatus': message.parsed.car_details.registrationStatus,
-                'color': message.parsed.car_details.color,
+                'color': get_id('color', message.parsed.car_details.color),
                 'doors': message.parsed.car_details.doors,
                 'seats': message.parsed.car_details.seats,
                 'price': message.parsed.car_details.price,
@@ -414,7 +419,7 @@ async def extract_car_details(car_detail_request: CarDetailsRequest):
                     'cylinder': message.parsed.car_details.cylinder,
                     'engineSize': message.parsed.car_details.engineSize,
                     'engineType': get_id('engineType', message.parsed.car_details.engineType),
-                    'color': message.parsed.car_details.color,
+                    'color': get_id('color', message.parsed.car_details.color),
                     'doors': message.parsed.car_details.doors,
                     'seats': message.parsed.car_details.seats,
                     'price': message.parsed.car_details.price,
