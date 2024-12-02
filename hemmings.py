@@ -1,8 +1,10 @@
 import re
+import os
 import io
 import gzip
 import time
 import json
+import requests
 import pycountry
 from datetime import datetime
 from pymongo import MongoClient
@@ -137,8 +139,20 @@ def get_raw_data(break_flag):
                         break_flag = True
                         break
 
+                    new_id = ObjectId()
+
                     if result.get('img'):
-                        image_list = [result.get('img')]
+                        output_dir = "../public_html/assets/img/cars/"
+                        response = requests.get(result.get('img'), timeout=10)
+                        response.raise_for_status()
+                        image_name = f"{str(new_id)+str(i)}.jpg"  # Save using the document's _id
+                        image_path = os.path.join(output_dir, image_name)
+
+                        # Save image to disk
+                        with open(image_path, 'wb') as file:
+                            file.write(response.content)
+
+                        image_list = f"https://autobrokerai.com/assets/img/cars/{image_name}"
                     else:
                         image_list = None
 

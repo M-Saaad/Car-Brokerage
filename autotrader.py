@@ -1,4 +1,5 @@
 import re
+import os
 import sys
 import time
 import json
@@ -166,9 +167,21 @@ def get_values(data):
 
     # image_features = []
     image_list = []
-    for image_doc in image_urls:
+    output_dir = "../public_html/assets/img/cars/"
+    new_id = ObjectId()
+
+    for i, image_doc in enumerate(image_urls):
         image_url = image_doc.get('photoViewerUrl')
-        image_list.append(image_url)
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
+        image_name = f"{str(new_id)+str(i)}.jpg"  # Save using the document's _id
+        image_path = os.path.join(output_dir, image_name)
+
+        # Save image to disk
+        with open(image_path, 'wb') as file:
+            file.write(response.content)
+
+        image_list.append(f"https://autobrokerai.com/assets/img/cars/{image_name}")
         # try:
         #     image_features.append(extract_features(image_url))
         # except:

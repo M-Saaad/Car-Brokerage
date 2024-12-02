@@ -1,4 +1,5 @@
 import re
+import os
 import json
 import requests
 from datetime import datetime
@@ -97,6 +98,22 @@ def get_raw_data(data):
                 print("Skipping!!!")
                 break
 
+            image_list = []
+            output_dir = "../public_html/assets/img/cars/"
+            new_id = ObjectId()
+
+            for i, img in enumerate([img['uri'] for img in doc['images']]):
+                response = requests.get(img, timeout=10)
+                response.raise_for_status()
+                image_name = f"{str(new_id)+str(i)}.jpg"  # Save using the document's _id
+                image_path = os.path.join(output_dir, image_name)
+
+                # Save image to disk
+                with open(image_path, 'wb') as file:
+                    file.write(response.content)
+
+                image_list.append(f"https://autobrokerai.com/assets/img/cars/{image_name}")
+
             listing_documents.append(upload_data({
                 'title': title,
                 'description': None,
@@ -120,7 +137,7 @@ def get_raw_data(data):
                 'seats': None,
                 'price': get_int(doc.get('pricing')['retailPrice']) if doc.get('pricing') else None,
                 'features': None,
-                'imageUrls': [img['uri'] for img in doc['images']],
+                'imageUrls': image_list,
                 'country': 'United States',
                 'city': city if city else None,
                 'website': 'Avis Car Sales',
