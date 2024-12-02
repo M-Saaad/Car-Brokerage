@@ -37,7 +37,7 @@ def download_and_update(entry):
 
             new_urls.append(f"https://autobrokerai.com/assets/img/cars/{image_name}")
 
-        # Update MongoDB with new image path
+        print("Updating:", str(entry['_id']))
         collection.update_one({'_id': entry['_id']}, {'$set': {'imageUrls': new_urls}})
     except Exception as e:
         print(f"Failed to process {image_url}: {e}")
