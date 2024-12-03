@@ -21,10 +21,10 @@ def download_and_update(entry):
     if not image_urls:
         return
 
-    try:
-        new_urls = []
-        
-        for i, image_url in enumerate(image_urls):
+    new_urls = []
+    
+    for i, image_url in enumerate(image_urls):
+        try:
             # Download image
             response = requests.get(image_url, timeout=10)
             response.raise_for_status()
@@ -36,18 +36,34 @@ def download_and_update(entry):
                 file.write(response.content)
 
             new_urls.append(f"https://autobrokerai.com/assets/img/cars/{image_name}")
+        
+        except Exception as e:
+            print(f"Failed to process {image_url}: {e}")
 
-        print("Updating:", str(entry['_id']))
+    print("Updating:", str(entry['_id']))
+    if new_urls:
         collection.update_one({'_id': entry['_id']}, {'$set': {'imageUrls': new_urls}})
-    except Exception as e:
-        print(f"Failed to process {image_url}: {e}")
+    else:
+        collection.update_one({'_id': entry['_id']}, {'$set': {'imageUrls': None}})
 
 def main():
-    # Fetch all documents with image URLs
-    entries = collection.find({'imageUrls': {'$exists': True}})
+    while(True):
+        try:
+            # Fetch all documents with image URLs
+            entries = collection.find({
+                "imageUrls": {
+                    "$elemMatch": {
+                        "$not": {
+                            "$regex": "^https://autobrokerai\\.com/"
+                        }
+                    }
+                }
+            })
 
-    for entry in entries:
-        download_and_update(entry)
+            for entry in entries:
+                download_and_update(entry)
+        except:
+            main()
 
 if __name__ == "__main__":
     main()
