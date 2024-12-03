@@ -291,7 +291,7 @@ async def extract_car_details(car_detail_request: CarDetailsRequest):
             - Model: (Specific car model, e.g., Corolla, Model S, etc.)
             - Year: (Year of manufacture, if visible or inferable)
             - Title: (A concise, attractive title suitable for a selling post)
-            - Description: (A brief and compelling description for listing the car for sale)
+            - Description: (Write a compelling description that highlights the car's unique selling points, features, and condition.)
             - Body Type: (Car type, e.g., Sedan, SUV, Compact, etc.)
             - Condition: (Assessed condition based on the images—e.g., excellent, good, used, etc.)
             - Assembly: (Whether the car is locally assembled or imported)
