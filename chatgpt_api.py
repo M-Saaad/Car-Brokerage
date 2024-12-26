@@ -118,7 +118,8 @@ def get_id(col_name, field_value):
 class SearchCarDetails(BaseModel):
     make: Optional[str]
     model: Optional[str]
-    year: Optional[int]
+    year_from: Optional[int]
+    year_to: Optional[int]
     mileage: Optional[int]
     bodyType: Optional[str]
     condition: Optional[str]
@@ -132,7 +133,8 @@ class SearchCarDetails(BaseModel):
     color: Optional[str]
     doors: Optional[int]
     seats: Optional[int]
-    price: Optional[int]
+    price_from: Optional[int]
+    price_to: Optional[int]
     country: Optional[str]
     city: Optional[str]
     website: Optional[str]
@@ -192,7 +194,8 @@ async def search_listing(car_request: SearchCarRequest):
             
             - Make: (Car manufacturer, e.g., Toyota, Honda, etc.)
             - Model: (Specific model, e.g., Corolla, Model S, etc.)
-            - Year: (Year of manufacture or range)
+            - Year From: (Earliest acceptable year based on user input)
+            - Year To: (Latest acceptable year based on user input)
             - Mileage: (Odometer reading or approximate estimation)
             - Body Type: (If mentioned or inferable from make and model i.e. Sedan, SUV, Hatchback, etc.)
             - Condition: (New, Used, or condition details based on description)
@@ -206,7 +209,8 @@ async def search_listing(car_request: SearchCarRequest):
             - Exterior Color: (Specific color if mentioned)
             - Number of Doors: (E.g., 2-door, 4-door)
             - Seats: (Number of seats if provided or inferable from make and model)
-            - Price: (Suggested selling price in USD or range based on details)
+            - Price From: (Minimum acceptable price based on user input)
+            - Price To: (Maximum acceptable price based on user input)
             - Country: (If mentioned or inferable from context)
             - City: (If mentioned or inferable from context)
             - Website: (Reference to where this car might be listed for sale)
@@ -232,7 +236,8 @@ async def search_listing(car_request: SearchCarRequest):
             car_details = {
                 'make': get_id('make', message.parsed.car_details.make),
                 'model': get_id('model', message.parsed.car_details.model),
-                'year': message.parsed.car_details.year,
+                'year_from': message.parsed.car_details.year_from or 0,
+                'year_to': message.parsed.car_details.year_to or 0,
                 'mileage': message.parsed.car_details.mileage,
                 'bodyType': get_id('bodyType', message.parsed.car_details.bodyType),
                 'condition': get_id('condition', message.parsed.car_details.condition),
@@ -246,7 +251,8 @@ async def search_listing(car_request: SearchCarRequest):
                 'color': get_id('color', message.parsed.car_details.color),
                 'doors': message.parsed.car_details.doors,
                 'seats': message.parsed.car_details.seats,
-                'price': message.parsed.car_details.price,
+                'price_from': message.parsed.car_details.price_from or 0,
+                'price_to': message.parsed.car_details.price_to or 0,
                 'country': message.parsed.car_details.country,
                 'city': message.parsed.car_details.city,
                 'website': get_id('website', message.parsed.car_details.website),
@@ -257,7 +263,7 @@ async def search_listing(car_request: SearchCarRequest):
         
         else:
             raise HTTPException(status_code=400, detail="Could not extract make, model, or year from the query.")
-    
+        
     except Exception as e:
         return HTTPException(car_details=None, error=f"Error: {str(e)}")
 
@@ -285,7 +291,8 @@ async def extract_car_details(car_detail_request: CarDetailsRequest):
 
         # Prepare the prompt for GPT-4 Vision
         vision_prompt = f"""
-            I am providing images of a car for analysis. Your task is to extract and infer detailed information from these images. Please prioritize identifying the make and model, while also providing the following details:
+            I am providing images and details of a car for analysis. Your task is to extract key information and write a description that sounds natural and human-like, as if written by someone selling their car on a listing platform. Avoid overly polished or "AI-generated" language. Keep the tone simple, relatable, and conversational.
+            In addition to creating the description, please extract and infer the following details from the images provided:
 
             - Make: (Manufacturer of the car, e.g., Toyota, Honda, etc.)
             - Model: (Specific car model, e.g., Corolla, Model S, etc.)
@@ -315,7 +322,7 @@ async def extract_car_details(car_detail_request: CarDetailsRequest):
             {sub_special_prompt}
             {sub_damage_prompt}
 
-            Ensure to capture all relevant information and make logical inferences wherever necessary, with a strong emphasis on identifying the make and model.
+            Ensure the description is relatable and captures the car's condition and appeal naturally.
         """
 
 
