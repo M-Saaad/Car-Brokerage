@@ -175,7 +175,7 @@ def get_int(string):
 make_list = []
 documents = []
 
-for make_anchor in sub_soup.find('section', attrs={'aria-labelledby': ':S2:'}).find_all('a')[:2]:
+for make_anchor in sub_soup.find('section', attrs={'aria-labelledby': ':S2:'}).find_all('a'):
     make = make_anchor.find('div', attrs={'class': 'flex w-full flex-col gap-1'}).find('p').text
     make_res = requests.get("https://www.motortrend.com" + make_anchor.get('href'), headers=headers)
     make_soup = BeautifulSoup(make_res.content, 'html.parser')
