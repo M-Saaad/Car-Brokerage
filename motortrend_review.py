@@ -20,7 +20,7 @@ conn_string = conn_data['mongo_conn_string']
 client = MongoClient(conn_string)
 db = client['test']
 
-review_collection = db['review']
+review_collection = db['reviews']
 make_collection = db['makes']
 model_collection = db['models']
 body_type_collection = db['bodytypes']
@@ -180,6 +180,11 @@ for make_anchor in sub_soup.find('section', attrs={'aria-labelledby': ':S2:'}).f
     make_res = requests.get("https://www.motortrend.com" + make_anchor.get('href'), headers=headers)
     make_soup = BeautifulSoup(make_res.content, 'html.parser')
 
+    try:
+        make_soup.find('div', attrs={'class': 'grid grid-flow-row grid-cols-1'}).find_all('a')
+    except:
+        continue
+
     for model_anchor in make_soup.find('div', attrs={'class': 'grid grid-flow-row grid-cols-1'}).find_all('a'):
         title = None
         description = None
@@ -220,6 +225,7 @@ for make_anchor in sub_soup.find('section', attrs={'aria-labelledby': ':S2:'}).f
             pass
         try:
             releaseDate = model_soup.find('time').text
+            releaseDate = datetime.strptime(releaseDate, '%b %d, %Y')
         except:
             pass
         try:
@@ -247,7 +253,7 @@ for make_anchor in sub_soup.find('section', attrs={'aria-labelledby': ':S2:'}).f
                 if spec[0].text == 'TORQUE (SAE NET)':
                     maxTorque = spec[1].text
                 if spec[0].text == '0-60 MPH':
-                    zeroToHundred = str(round(float(spec[1].text.replace(' sec', '')) * (100 / (60 * 1.60934)), 2)) + ' sec'
+                    zeroToHundred = round(float(spec[1].text.replace(' sec', '')) * (100 / (60 * 1.60934)), 2)
         except:
             pass
         
