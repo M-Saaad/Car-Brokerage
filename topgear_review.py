@@ -73,12 +73,17 @@ for make in make_list:
     urls = [[d['attributes']['title'], 'https://www.topgear.com' + d['attributes']['url']] for d in data['data']]
 
     for url in urls:
+        print('Url:', url[1])
         model = url[0].replace(make, '').strip()
 
         res = requests.get(url[1])
         soup = BeautifulSoup(res.content, 'html.parser')
-
-        title = soup.find('h1', attrs={'data-testid': 'Canon'}).text
+    
+        try:
+            title = soup.find('h1', attrs={'data-testid': 'Canon'}).text
+        except:
+            print('continuing...')
+            continue
         releaseDate = soup.find('span', attrs={'class': 'sc-brKeYL CreatedDate-sc-10pl2l7-5 cAsxkv cTCKck'}).text
         try:
             price = soup.find('div', attrs={'class': 'sc-beqWaB dGitLJ'}).find('span', attrs={'data-testid': 'PriceText'}).text
