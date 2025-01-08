@@ -144,8 +144,8 @@ for make in make_list:
             "updatedAt": datetime.now()
         })
 
-        if break_flag:
-            break
+    if break_flag:
+        break
 
 if documents:
     listing_result = review_collection.insert_many(documents)
