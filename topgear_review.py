@@ -19,6 +19,8 @@ titles = [d['title'] for d in list(review_collection.find({}, {"title": 1, "_id"
 makess = list(make_collection.find({}, { "name": 1 }))
 models = list(model_collection.find({}, { "name": 1 }))
 
+break_flag = False
+
 def get_id(col_name, field_value):
     result = None
     global makess
@@ -83,6 +85,7 @@ for make in make_list:
         try:
             title = soup.find('h1', attrs={'data-testid': 'Canon'}).text
             if title in titles:
+                break_flag = True
                 break
         except:
             print('continuing...')
@@ -140,6 +143,9 @@ for make in make_list:
             "createdAt": datetime.now(),
             "updatedAt": datetime.now()
         })
+
+        if break_flag:
+            break
 
 if documents:
     listing_result = review_collection.insert_many(documents)
