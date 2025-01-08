@@ -15,6 +15,7 @@ db = client['test']
 review_collection = db['reviews']
 make_collection = db['makes']
 model_collection = db['models']
+titles = [d['title'] for d in list(review_collection.find({}, {"title": 1, "_id": 0}))]
 makess = list(make_collection.find({}, { "name": 1 }))
 models = list(model_collection.find({}, { "name": 1 }))
 
@@ -81,6 +82,8 @@ for make in make_list:
     
         try:
             title = soup.find('h1', attrs={'data-testid': 'Canon'}).text
+            if title in titles:
+                break
         except:
             print('continuing...')
             continue
