@@ -120,7 +120,8 @@ class SearchCarDetails(BaseModel):
     model: Optional[str]
     year_from: Optional[int]
     year_to: Optional[int]
-    mileage: Optional[int]
+    mileage_from: Optional[int]
+    mileage_to: Optional[int]
     bodyType: Optional[str]
     condition: Optional[str]
     assembly: Optional[str]
@@ -196,8 +197,9 @@ async def search_listing(car_request: SearchCarRequest):
             - Model: (Specific model, e.g., Corolla, Model S, etc.)
             - Year From: (Earliest acceptable year based on user input)
             - Year To: (Latest acceptable year based on user input)
-            - Mileage: (Odometer reading or approximate estimation)
-            - Body Type: (If mentioned or inferable from make and model i.e. Sedan, SUV, Hatchback, etc.)
+            - Mileage From: (Minimum acceptable odometer reading based on user input)
+            - Mileage To: (Maximum acceptable odometer reading based on user input)
+            - Body Type: (If mentioned or inferable from make and model, e.g., Sedan, SUV, Hatchback, etc.)
             - Condition: (New, Used, or condition details based on description)
             - Assembly: (Local or Imported)
             - Driver Type: (Left-hand drive or Right-hand drive)
@@ -238,7 +240,8 @@ async def search_listing(car_request: SearchCarRequest):
                 'model': get_id('model', message.parsed.car_details.model),
                 'year_from': message.parsed.car_details.year_from or 0,
                 'year_to': message.parsed.car_details.year_to or 0,
-                'mileage': message.parsed.car_details.mileage,
+                'mileage_from': message.parsed.car_details.mileage_from or 0,
+                'mileage_to': message.parsed.car_details.mileage_to or 0,
                 'bodyType': get_id('bodyType', message.parsed.car_details.bodyType),
                 'condition': get_id('condition', message.parsed.car_details.condition),
                 'assembly': get_id('assembly', message.parsed.car_details.assembly),
