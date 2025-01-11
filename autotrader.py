@@ -316,34 +316,34 @@ for i in list(range(0, 1000, 100)):
 
         print('Link:', link)
 
-        try:
+        # try:
 
-            product_soup = recursive_try(link)
+        product_soup = recursive_try(link)
 
-            if product_soup:
+        if product_soup:
 
-                waiting_count = 0
+            waiting_count = 0
 
-                raw_data = get_raw_data(product_soup)
+            raw_data = get_raw_data(product_soup)
 
-                structured_data = get_values(raw_data)
+            structured_data = get_values(raw_data)
 
-                if structured_data['title'] in titles and structured_data['mileage'] in mileages:
-                    print('Duplicate listing:', {structured_data['title']})
-                    break_flag = True
-                    break
-
-                doc = upload_data(structured_data)
-
-                doc['source'] = link
-
-                documents.append(doc)
-            else:
+            if structured_data['title'] in titles and structured_data['mileage'] in mileages:
+                print('Duplicate listing:', {structured_data['title']})
                 break_flag = True
                 break
 
-        except:
-            print("Skipping Link:", link)
+            doc = upload_data(structured_data)
+
+            doc['source'] = link
+
+            documents.append(doc)
+        else:
+            break_flag = True
+            break
+
+        # except:
+        #     print("Skipping Link:", link)
         
     if break_flag:
         print("Ending...")
