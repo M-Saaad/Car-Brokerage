@@ -31,7 +31,7 @@ def download_and_update(entry):
             image_name = f"{str(entry['_id'])+str(i)}.jpg"  # Save using the document's _id
             image_path = os.path.join(output_dir, image_name)
 
-            if not os.path.exists(image_path):
+            if not os.path.exists(output_dir):
                 os.makedirs(image_path) 
 
             # Save image to disk
