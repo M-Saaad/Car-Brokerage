@@ -177,6 +177,9 @@ def get_values(data):
         image_name = f"{str(new_id)+str(i)}.jpg"  # Save using the document's _id
         image_path = os.path.join(output_dir, image_name)
 
+        if not os.path.exists(image_path):
+            os.makedirs(image_path) 
+
         # Save image to disk
         with open(image_path, 'wb') as file:
             file.write(response.content)
@@ -313,30 +316,34 @@ for i in list(range(0, 1000, 100)):
 
         print('Link:', link)
 
-        product_soup = recursive_try(link)
+        try:
 
-        if product_soup:
+            product_soup = recursive_try(link)
 
-            waiting_count = 0
+            if product_soup:
 
-            raw_data = get_raw_data(product_soup)
+                waiting_count = 0
 
-            structured_data = get_values(raw_data)
+                raw_data = get_raw_data(product_soup)
 
-            if structured_data['title'] in titles and structured_data['mileage'] in mileages:
-                print('Duplicate listing:', {structured_data['title']})
+                structured_data = get_values(raw_data)
+
+                if structured_data['title'] in titles and structured_data['mileage'] in mileages:
+                    print('Duplicate listing:', {structured_data['title']})
+                    break_flag = True
+                    break
+
+                doc = upload_data(structured_data)
+
+                doc['source'] = link
+
+                documents.append(doc)
+            else:
                 break_flag = True
                 break
 
-            doc = upload_data(structured_data)
-
-            doc['source'] = link
-
-            documents.append(doc)
-        else:
-            break_flag = True
-            break
-
+        except:
+            print("Skipping Link:", link)
         
     if break_flag:
         print("Ending...")

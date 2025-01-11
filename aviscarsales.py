@@ -108,6 +108,9 @@ def get_raw_data(data):
                 image_name = f"{str(new_id)+str(i)}.jpg"  # Save using the document's _id
                 image_path = os.path.join(output_dir, image_name)
 
+                if not os.path.exists(image_path):
+                    os.makedirs(image_path) 
+
                 # Save image to disk
                 with open(image_path, 'wb') as file:
                     file.write(response.content)
