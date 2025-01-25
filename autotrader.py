@@ -160,7 +160,7 @@ def get_values(data):
     pattern = r"(?<=new & used )(.*?)(?= for sale within)"
     temp_title = re.search(pattern, title)
     if temp_title:
-        title = temp_title.group(0)
+        title = temp_title.group(0).replace('vehicles ', '')
 
     if condition not in ["New", "Used"]:
         condition = None
