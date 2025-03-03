@@ -141,26 +141,29 @@ def get_raw_data(break_flag):
 
                     new_id = ObjectId()
 
-                    if result.get('img'):
-                        output_dir = "../public_html/assets/img/cars/"
-                        response = requests.get(result.get('img'), timeout=10)
-                        response.raise_for_status()
-                        image_name = f"{str(new_id)+str(i)}.jpg"  # Save using the document's _id
-                        image_path = os.path.join(output_dir, image_name)
+                    # if result.get('img'):
+                    #     output_dir = "../public_html/assets/img/cars/"
+                    #     response = requests.get(result.get('img'), timeout=10)
+                    #     response.raise_for_status()
+                    #     image_name = f"{str(new_id)+str(i)}.jpg"  # Save using the document's _id
+                    #     image_path = os.path.join(output_dir, image_name)
 
-                        if not os.path.exists(output_dir):
-                            os.makedirs(image_path) 
+                    #     if not os.path.exists(output_dir):
+                    #         os.makedirs(image_path) 
 
-                        if not os.path.exists(output_dir):
-                            os.makedirs(image_path) 
+                    #     if not os.path.exists(output_dir):
+                    #         os.makedirs(image_path) 
 
-                        # Save image to disk
-                        with open(image_path, 'wb') as file:
-                            file.write(response.content)
+                    #     # Save image to disk
+                    #     with open(image_path, 'wb') as file:
+                    #         file.write(response.content)
 
-                        image_list = f"https://autobrokerai.com/assets/img/cars/{image_name}"
-                    else:
-                        image_list = None
+                    #     image_list = f"https://autobrokerai.com/assets/img/cars/{image_name}"
+                    # else:
+                    #     image_list = None
+
+
+
 
                     # if source.startswith('https://www.autotempest.com'):
                     #     sub_req = requests.get(source, headers=headers, timeout=15)
@@ -217,7 +220,7 @@ def get_raw_data(break_flag):
                             'seats': None, # Not found
                             'price': price,
                             'features': None,
-                            'imageUrls': image_list,
+                            'imageUrls': [result.get('img')],
                             'country': country,
                             'city': city,
                             'website': website,

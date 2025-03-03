@@ -165,30 +165,30 @@ def get_values(data):
     if condition not in ["New", "Used"]:
         condition = None
 
-    # image_features = []
-    image_list = []
-    output_dir = "../public_html/assets/img/cars/"
-    new_id = ObjectId()
+    # # image_features = []
+    # image_list = []
+    # output_dir = "../public_html/assets/img/cars/"
+    # new_id = ObjectId()
 
-    for i, image_doc in enumerate(image_urls):
-        image_url = image_doc.get('photoViewerUrl')
-        response = requests.get(image_url, timeout=10)
-        response.raise_for_status()
-        image_name = f"{str(new_id)+str(i)}.jpg"  # Save using the document's _id
-        image_path = os.path.join(output_dir, image_name)
+    # for i, image_doc in enumerate(image_urls):
+    #     image_url = image_doc.get('photoViewerUrl')
+    #     response = requests.get(image_url, timeout=10)
+    #     response.raise_for_status()
+    #     image_name = f"{str(new_id)+str(i)}.jpg"  # Save using the document's _id
+    #     image_path = os.path.join(output_dir, image_name)
 
-        if not os.path.exists(output_dir):
-            os.makedirs(image_path) 
+    #     if not os.path.exists(output_dir):
+    #         os.makedirs(image_path) 
 
-        # Save image to disk
-        with open(image_path, 'wb') as file:
-            file.write(response.content)
+    #     # Save image to disk
+    #     with open(image_path, 'wb') as file:
+    #         file.write(response.content)
 
-        image_list.append(f"https://autobrokerai.com/assets/img/cars/{image_name}")
-        # try:
-        #     image_features.append(extract_features(image_url))
-        # except:
-        #     print('Cannot extract feature:', image_url)
+    #     image_list.append(f"https://autobrokerai.com/assets/img/cars/{image_name}")
+    #     # try:
+    #     #     image_features.append(extract_features(image_url))
+    #     # except:
+    #     #     print('Cannot extract feature:', image_url)
 
     for specs in data['ngVdpModel']['specifications']['specs']:
         if specs['key'] == 'Body Type':
@@ -236,7 +236,7 @@ def get_values(data):
         'seats': None, # Not found
         'price': int(price.replace(',', '')),
         'features': features,
-        'imageUrls': image_list,
+        'imageUrls': image_urls,
         # 'imageFeatures': image_features,
         'country': country,
         'city': city,
@@ -263,9 +263,9 @@ def recursive_try(link):
             waiting_count += 1
             print('Waiting...')
             time.sleep(15*60)
-            product_soup = recursive_try(link)
+            product_soup, product_req.content = recursive_try(link)
         
-        return product_soup
+        return product_soup, product_req.content
     else:
         return None
 
@@ -316,34 +316,34 @@ for i in list(range(0, 1000, 100)):
 
         print('Link:', link)
 
-        # try:
+        try:
 
-        product_soup = recursive_try(link)
+            product_soup, content = recursive_try(link)
 
-        if product_soup:
+            if product_soup:
 
-            waiting_count = 0
+                waiting_count = 0
 
-            raw_data = get_raw_data(product_soup)
+                raw_data = get_raw_data(product_soup)
 
-            structured_data = get_values(raw_data)
+                structured_data = get_values(raw_data)
 
-            if structured_data['title'] in titles and structured_data['mileage'] in mileages:
-                print('Duplicate listing:', {structured_data['title']})
+                if structured_data['title'] in titles and structured_data['mileage'] in mileages:
+                    print('Duplicate listing:', {structured_data['title']})
+                    break_flag = True
+                    break
+
+                doc = upload_data(structured_data)
+
+                doc['source'] = link
+
+                documents.append(doc)
+            else:
                 break_flag = True
                 break
 
-            doc = upload_data(structured_data)
-
-            doc['source'] = link
-
-            documents.append(doc)
-        else:
-            break_flag = True
-            break
-
-        # except:
-        #     print("Skipping Link:", link)
+        except:
+            print("Skipping Link:", link)
         
     if break_flag:
         print("Ending...")
