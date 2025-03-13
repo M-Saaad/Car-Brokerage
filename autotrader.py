@@ -165,6 +165,8 @@ def get_values(data):
     if condition not in ["New", "Used"]:
         condition = None
 
+    image_urls = [x['photoViewerUrl'] for x in image_urls]
+
     # # image_features = []
     # image_list = []
     # output_dir = "../public_html/assets/img/cars/"
