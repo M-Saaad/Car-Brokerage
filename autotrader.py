@@ -353,6 +353,7 @@ for i in list(range(0, 1000, 100)):
     
     if documents:
         result = collection.insert_many(documents)
+        print("length: ", len(documents))
     else:
         print("No result found.")
 
