@@ -262,32 +262,33 @@ for make_anchor in sub_soup.find('section', attrs={'aria-labelledby': ':S2:'}).f
         except:
             pass
 
-        documents.append({
-            'title': title,
-            'description': description,
-            'overview': overview,
-            'make': get_id('makess', make),
-            'model': get_id('models', model),
-            'releaseDate': releaseDate,
-            'bodyType': None,
-            'transmission': get_id('transmissions', transmission), 
-            'engineSize': get_id('engine_types', engineSize),
-            'engineType': None,
-            'fuelConsumption': fuelConsumption, 
-            'price': get_int(price),
-            'maxPower': maxPower,
-            'maxTorque': maxTorque,
-            'zeroToHundred': zeroToHundred,
-            'imageUrl': imageUrl, 
-            'fiveStar': None,
-            'fourStar': None,
-            'threeStar': None, 
-            'twoStar': None,
-            'oneStar': None,
-            'analytics': None,
-            "createdAt": datetime.now(),
-            "updatedAt": datetime.now()
-        })
+        if imageUrl:
+            documents.append({
+                'title': title,
+                'description': description,
+                'overview': overview,
+                'make': get_id('makess', make),
+                'model': get_id('models', model),
+                'releaseDate': releaseDate,
+                'bodyType': None,
+                'transmission': get_id('transmissions', transmission), 
+                'engineSize': get_id('engine_types', engineSize),
+                'engineType': None,
+                'fuelConsumption': fuelConsumption, 
+                'price': get_int(price),
+                'maxPower': maxPower,
+                'maxTorque': maxTorque,
+                'zeroToHundred': zeroToHundred,
+                'imageUrl': imageUrl, 
+                'fiveStar': None,
+                'fourStar': None,
+                'threeStar': None, 
+                'twoStar': None,
+                'oneStar': None,
+                'analytics': None,
+                "createdAt": datetime.now(),
+                "updatedAt": datetime.now()
+            })
 
 if documents:
     listing_result = review_collection.insert_many(documents)

@@ -117,32 +117,33 @@ for make in make_list:
                 if heading == 'BHP':
                     maxPower = specs[i] + ' bhp'
 
-        documents.append({
-            'title': title,
-            'description': description,
-            'overview': overview,
-            'make': get_id('makess', make),
-            'model': get_id('models', model),
-            'releaseDate': datetime.strptime(releaseDate.replace('Published: ', '').strip(), '%d %b %Y'),
-            'bodyType': None,
-            'transmission': None, 
-            'engineSize': None,
-            'engineType': None,
-            'fuelConsumption': None, 
-            'price': get_int(price),
-            'maxPower': maxPower,
-            'maxTorque': None,
-            'zeroToHundred': float(zeroToHundred.replace('s', '')) if zeroToHundred else None,
-            'imageUrl': imageUrl, 
-            'fiveStar': None,
-            'fourStar': None,
-            'threeStar': None, 
-            'twoStar': None,
-            'oneStar': None,
-            'analytics': None,
-            "createdAt": datetime.now(),
-            "updatedAt": datetime.now()
-        })
+        if imageUrl:
+            documents.append({
+                'title': title,
+                'description': description,
+                'overview': overview,
+                'make': get_id('makess', make),
+                'model': get_id('models', model),
+                'releaseDate': datetime.strptime(releaseDate.replace('Published: ', '').strip(), '%d %b %Y'),
+                'bodyType': None,
+                'transmission': None, 
+                'engineSize': None,
+                'engineType': None,
+                'fuelConsumption': None, 
+                'price': get_int(price),
+                'maxPower': maxPower,
+                'maxTorque': None,
+                'zeroToHundred': float(zeroToHundred.replace('s', '')) if zeroToHundred else None,
+                'imageUrl': imageUrl, 
+                'fiveStar': None,
+                'fourStar': None,
+                'threeStar': None, 
+                'twoStar': None,
+                'oneStar': None,
+                'analytics': None,
+                "createdAt": datetime.now(),
+                "updatedAt": datetime.now()
+            })
 
     if break_flag:
         break

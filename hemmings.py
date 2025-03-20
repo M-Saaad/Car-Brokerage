@@ -166,90 +166,93 @@ def get_raw_data(break_flag):
 
                     end_date = result.get('endDate')
                     
-                    if end_date:
-                        bid = int(re.sub(r'[^\d]', '', result['currentBid'])) if result.get('currentBid') else None
-                        auction_documents.append(upload_data({
-                            'title': title,
-                            'description': description,
-                            'make': make,
-                            'model': model,
-                            'year': year,
-                            'mileage': mileage,
-                            # 'bodyType': type,
-                            'condition': None,
-                            'assembly': None, # Not found
-                            'vin': vin,
-                            'zipCode': None,
-                            # 'fuelType': # hamza said not using
-                            "driverType": None, # Not found
-                            'transmission': transmission,
-                            'cylinder': cylinder,
-                            'engineSize': engine,
-                            'engineType': fuel_type,
-                            'registrationStatus': None, # Not found
-                            'color': color,
-                            'doors': None,
-                            'seats': None, # Not found
-                            'price': price,
-                            'features': None,
-                            'imageUrls': result.get('img'),
-                            'country': country,
-                            'city': city,
-                            'website': website,
-                            'source': source,
-                            'views': 0,
-                            'likes': 0,
-                            "status": 'Active',
-                            "cpePick": False,
-                            'soldThrough': None, # Dont know
-                            "package": 'Free',
-                            "userId": "Admin 1",
-                            "createdAt": datetime.now(),
-                            "updatedAt": datetime.now(),
-                            "bid": bid,
-                            "startDate": result.get('ctime'),
-                            "endDate": end_date
-                        }))
-                    else:
-                        listing_documents.append(upload_data({
-                            'title': title,
-                            'description': description,
-                            'make': make,
-                            'model': model,
-                            'year': year,
-                            'mileage': mileage,
-                            # 'bodyType': type,
-                            'condition': None,
-                            'assembly': None, # Not found
-                            'vin': vin,
-                            'zipCode': None,
-                            # 'fuelType': # hamza said not using
-                            "driverType": None, # Not found
-                            'transmission': transmission,
-                            'cylinder': cylinder,
-                            'engineSize': engine,
-                            'engineType': fuel_type,
-                            'registrationStatus': None, # Not found
-                            'color': color,
-                            'doors': None,
-                            'seats': None, # Not found
-                            'price': price,
-                            'features': None,
-                            'imageUrls': image_list,
-                            'country': country,
-                            'city': city,
-                            'website': website,
-                            'source': source,
-                            'views': 0,
-                            'likes': 0,
-                            "status": 'Active',
-                            "cpePick": False,
-                            'soldThrough': None, # Dont know
-                            "package": 'Free',
-                            "userId": "Admin 1",
-                            "createdAt": datetime.now(),
-                            "updatedAt": datetime.now()
-                        }))
+                    image_list = result.get('img')
+
+                    if image_list:
+                        if end_date:
+                            bid = int(re.sub(r'[^\d]', '', result['currentBid'])) if result.get('currentBid') else None
+                            auction_documents.append(upload_data({
+                                'title': title,
+                                'description': description,
+                                'make': make,
+                                'model': model,
+                                'year': year,
+                                'mileage': mileage,
+                                # 'bodyType': type,
+                                'condition': None,
+                                'assembly': None, # Not found
+                                'vin': vin,
+                                'zipCode': None,
+                                # 'fuelType': # hamza said not using
+                                "driverType": None, # Not found
+                                'transmission': transmission,
+                                'cylinder': cylinder,
+                                'engineSize': engine,
+                                'engineType': fuel_type,
+                                'registrationStatus': None, # Not found
+                                'color': color,
+                                'doors': None,
+                                'seats': None, # Not found
+                                'price': price,
+                                'features': None,
+                                'imageUrls': image_list,
+                                'country': country,
+                                'city': city,
+                                'website': website,
+                                'source': source,
+                                'views': 0,
+                                'likes': 0,
+                                "status": 'Active',
+                                "cpePick": False,
+                                'soldThrough': None, # Dont know
+                                "package": 'Free',
+                                "userId": "Admin 1",
+                                "createdAt": datetime.now(),
+                                "updatedAt": datetime.now(),
+                                "bid": bid,
+                                "startDate": result.get('ctime'),
+                                "endDate": end_date
+                            }))
+                        else:
+                            listing_documents.append(upload_data({
+                                'title': title,
+                                'description': description,
+                                'make': make,
+                                'model': model,
+                                'year': year,
+                                'mileage': mileage,
+                                # 'bodyType': type,
+                                'condition': None,
+                                'assembly': None, # Not found
+                                'vin': vin,
+                                'zipCode': None,
+                                # 'fuelType': # hamza said not using
+                                "driverType": None, # Not found
+                                'transmission': transmission,
+                                'cylinder': cylinder,
+                                'engineSize': engine,
+                                'engineType': fuel_type,
+                                'registrationStatus': None, # Not found
+                                'color': color,
+                                'doors': None,
+                                'seats': None, # Not found
+                                'price': price,
+                                'features': None,
+                                'imageUrls': image_list,
+                                'country': country,
+                                'city': city,
+                                'website': website,
+                                'source': source,
+                                'views': 0,
+                                'likes': 0,
+                                "status": 'Active',
+                                "cpePick": False,
+                                'soldThrough': None, # Dont know
+                                "package": 'Free',
+                                "userId": "Admin 1",
+                                "createdAt": datetime.now(),
+                                "updatedAt": datetime.now()
+                            }))
         if break_flag:
             break
 

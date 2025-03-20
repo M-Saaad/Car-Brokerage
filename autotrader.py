@@ -339,7 +339,8 @@ for i in list(range(0, 1000, 100)):
 
                 doc['source'] = link
 
-                documents.append(doc)
+                if doc['imageUrls']:
+                    documents.append(doc)
             else:
                 break_flag = True
                 break
