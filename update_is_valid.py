@@ -77,8 +77,7 @@ def get_updated_entries():
         with open("update_logs.json") as json_file:
             logs = json.load(json_file, indent=4)
     except:
-        with open("update_logs.json", "w") as json_file:
-            json.dump([], json_file, indent=4)
+        logs = []
 
     # Gather IDs of documents with invalid URLs
     for entry in listings:
@@ -114,6 +113,9 @@ def get_updated_entries():
             {"$set": {"invalid": True}}  # Update invalid field to True
         )
         print(f"Bulk updated {result.modified_count} entries.")
+
+    with open("update_logs.json", "w") as json_file:
+        json.dump(logs, json_file, indent=4)
 
 if __name__ == "__main__":
     get_updated_entries()
