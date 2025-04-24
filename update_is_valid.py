@@ -2,6 +2,7 @@ from pymongo import MongoClient, UpdateOne
 import requests
 from collections.abc import Iterable
 import json
+from datetime import datetime
 
 # Load MongoDB credentials
 with open("credential.json") as json_file:
@@ -72,6 +73,13 @@ def get_updated_entries():
     #     listing_collection.bulk_write(bulk_updates)
     #     print(f"Bulk updated {len(bulk_updates)} entries.")
 
+    try:
+        with open("update_logs.json") as json_file:
+            logs = json.load(json_file, indent=4)
+    except:
+        with open("update_logs.json", "w") as json_file:
+            json.dump([], json_file, indent=4)
+
     # Gather IDs of documents with invalid URLs
     for entry in listings:
         source = entry.get("source")
@@ -82,6 +90,18 @@ def get_updated_entries():
 
         souce_valid = is_valid_url(source)
         images_valid = is_valid_url(image_urls)
+
+        logs.append(
+            {
+                str(datetime.now()): {
+                    entry_id: {
+                        'website': website_text,
+                        'souce_valid': souce_valid,
+                        'images_valid': images_valid
+                    }
+                }
+            }
+        )
 
         if not souce_valid or not images_valid:
             invalid_ids.append(entry_id)
