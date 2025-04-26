@@ -51,10 +51,10 @@ def get_updated_entries():
     invalid_ids = []
     
     # Fetch entries where "invalid" does not exist
-    listings = listing_collection.find(
+    listings = list(listing_collection.find(
         {"invalid": {"$exists": False}}, 
         {"source": 1, "price": 1, "imageUrls": 1, "website": 1, "_id": 1}
-    )
+    ))
 
     # for entry in listings:
     #     source = entry.get("source")
