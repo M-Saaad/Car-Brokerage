@@ -157,6 +157,7 @@ def get_values(data):
     # views = data['ngVdpModel'][''] # not found
     # likes = data['ngVdpModel'][''] # not found
 
+    title = re.sub(r"\s+", " ", title).strip()
     pattern = r"(?<=new & used )(.*?)(?= for sale within)"
     temp_title = re.search(pattern, title)
     if temp_title:
