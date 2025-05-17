@@ -1,3 +1,6 @@
+# Change user to autobrokerai
+su autobrokerai
+
 # Change directory to project
 cd /home/autobrokerai/Car-Brokerage
 
