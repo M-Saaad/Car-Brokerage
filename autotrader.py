@@ -44,16 +44,20 @@ driver_type_collection = db['drivertypes']
 fuel_type_collection = db['fueltypes']
 transmission_collection = db['transmissions']
 
-listing_docs = list(collection.find({"website": ObjectId('66ca13d8bba544259919833a')}, { "title": 1, "mileage": 1, "_id": 0 }))
-titles = []
-mileages = []
 
-for d in listing_docs:
-    if d.get('title') and d.get('mileage'):
-        titles.append(d.get('title'))
-        mileages.append(d.get('mileage'))
+# Query for listings from a specific website, projecting only needed fields
+query = { "website": ObjectId("66ca13d8bba544259919833a") }
+projection = { "_id": 0, "title": 1, "source": 1, "mileage": 1 }
 
-waiting_count = 0
+# Fetch matching documents
+listing_docs = collection.find(query, projection)
+
+# Extract titles and sources where both title and mileage are present
+titles, sources = zip(*[
+    (doc["title"], doc["source"])
+    for doc in listing_docs
+    if "title" in doc and "mileage" in doc
+]) if listing_docs.alive else ([], [])
 
 # # Load pre-trained model (fine-tuned for car detection)
 # model = EfficientNetB0(weights='imagenet')
@@ -320,18 +324,17 @@ for i in list(range(0, 1000, 100)):
         print('Link:', link)
 
         try:
-
+            waiting_count = 0
+            
             product_soup, content = recursive_try(link)
 
             if product_soup:
-
-                waiting_count = 0
 
                 raw_data = get_raw_data(product_soup)
 
                 structured_data = get_values(raw_data)
 
-                if structured_data['title'] in titles and structured_data['mileage'] in mileages:
+                if structured_data['title'] in titles and link in sources:
                     print('Duplicate listing:', {structured_data['title']})
                     break_flag = True
                     break
