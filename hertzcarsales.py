@@ -95,14 +95,15 @@ driver_types = list(driver_type_collection.find({}, { "name": 1 }))
 fuel_types = list(fuel_type_collection.find({}, { "name": 1 }))
 transmissions = list(transmission_collection.find({}, { "name": 1 }))
 
-listing_docs = list(listing_collection.find({"website": ObjectId('672f377ed2b0a68386cdf184')}, { "title": 1, "mileage": 1, "_id": 0 }))
-titles = []
-mileages = []
+# Query for listings from a specific website, projecting only needed fields
+query = { "website": ObjectId("66ca13d8bba544259919833a") }
+projection = { "_id": 0, "source": 1 }
 
-for d in listing_docs:
-    if d.get('title') and d.get('mileage'):
-        titles.append(d.get('title'))
-        mileages.append(d.get('mileage'))
+# Fetch and sort documents
+cursor = listing_collection.find(query, projection).sort("createdAt", -1)
+
+# Extract list of 'source' values
+db_sources = [doc["source"] for doc in cursor if "source" in doc]
 
 def get_int(string):
     try:
@@ -133,6 +134,7 @@ def get_raw_data(data):
     if data.get('inventory'):
         for doc in data['inventory']:
             title = ' '.join(doc.get('title'))
+            source = 'https://www.hertzcarsales.com' + doc.get('link')
 
             mileage = None
             engine = None
@@ -151,7 +153,7 @@ def get_raw_data(data):
                 if attr['name'] == 'accountName' and attr['label'] == 'Location':
                     city = attr['value'].replace('Avis ', '').replace('Car Sales ', '').strip()
 
-            if title in titles and mileage in mileages:
+            if source in db_sources:
                 print("Skipping!!!")
                 break
 
@@ -200,11 +202,11 @@ def get_raw_data(data):
                     'seats': None,
                     'price': get_int(doc.get('pricing')['retailPrice']) if doc.get('pricing') else None,
                     'features': None,
-                    'imageUrls': ,
+                    'imageUrls': image_list,
                     'country': 'United States',
                     'city': city if city else None,
                     'website': 'Hertz Car Sales',
-                    'source': 'https://www.hertzcarsales.com' + doc.get('link'),
+                    'source': source,
                     'views': 0,
                     'likes': 0,
                     'status': 'Active',

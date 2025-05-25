@@ -30,7 +30,7 @@ conn_string = conn_data['mongo_conn_string']
 
 client = MongoClient(conn_string)
 db = client['test']
-collection = db['listings']
+listing_collection = db['listings']
 make_collection = db['makes']
 model_collection = db['models']
 body_type_collection = db['bodytypes']
@@ -44,16 +44,15 @@ driver_type_collection = db['drivertypes']
 fuel_type_collection = db['fueltypes']
 transmission_collection = db['transmissions']
 
-
 # Query for listings from a specific website, projecting only needed fields
 query = { "website": ObjectId("66ca13d8bba544259919833a") }
 projection = { "_id": 0, "source": 1 }
 
 # Fetch and sort documents
-cursor = collection.find(query, projection).sort("createdAt", -1)
+cursor = listing_collection.find(query, projection).sort("createdAt", -1)
 
 # Extract list of 'source' values
-sources = [doc["source"] for doc in cursor if "source" in doc]
+db_sources = [doc["source"] for doc in cursor if "source" in doc]
 
 # # Load pre-trained model (fine-tuned for car detection)
 # model = EfficientNetB0(weights='imagenet')
@@ -330,7 +329,7 @@ for i in list(range(0, 1000, 100)):
 
                 structured_data = get_values(raw_data)
 
-                if link in sources:
+                if link in db_sources:
                     print('Duplicate listing:', {link})
                     break_flag = True
                     break
@@ -353,7 +352,7 @@ for i in list(range(0, 1000, 100)):
         break
     
     if documents:
-        result = collection.insert_many(documents)
+        result = listing_collection.insert_many(documents)
         print("length: ", len(documents))
     else:
         print("No result found.")

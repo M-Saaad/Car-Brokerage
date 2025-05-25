@@ -57,17 +57,15 @@ driver_types = list(driver_type_collection.find({}, { "name": 1 }))
 fuel_types = list(fuel_type_collection.find({}, { "name": 1 }))
 transmissions = list(transmission_collection.find({}, { "name": 1 }))
 
-listing_docs = list(listing_collection.find({"website": ObjectId('670d3996b3c83649dab17ec4')}, { "title": 1, "mileage": 1, "_id": 0 }))
-titles = []
-mileages = []
+# Query for listings from a specific website, projecting only needed fields
+query = { "website": ObjectId("66ca13d8bba544259919833a") }
+projection = { "_id": 0, "source": 1 }
 
-for d in listing_docs:
-    if d.get('title') and d.get('mileage'):
-        titles.append(d.get('title'))
-        mileages.append(d.get('mileage'))
-auction_docs = list(auctions_collection.find({"website": ObjectId('670d3996b3c83649dab17ec4')}, { "title": 1, "mileage": 1, "_id": 0 }))
-titles.extend([t['title'] for t in auction_docs])
-mileages.extend([m.get('mileage') for m in auction_docs])
+# Fetch and sort documents
+cursor = listing_collection.find(query, projection).sort("createdAt", -1)
+
+# Extract list of 'source' values
+db_sources = [doc["source"] for doc in cursor if "source" in doc]
 
 def get_country_name(country_code):
     try:
@@ -134,7 +132,7 @@ def get_raw_data(break_flag):
                     source = result.get('url').replace('\\', '')
                     website = "Car"
 
-                    if title in titles and mileage in mileages:
+                    if source in db_sources:
                         print("Skipping!!!")
                         break_flag = True
                         break
