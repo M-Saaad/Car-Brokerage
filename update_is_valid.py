@@ -33,7 +33,8 @@ def is_valid_url(urls):
 
     for url in urls:
         try:
-            response = requests.head(url, allow_redirects=True, headers=HEADERS, timeout=5)
+            # response = requests.get(url, allow_redirects=True, headers=HEADERS, timeout=5)
+            response = requests.head(url, allow_redirects=True, headers=HEADERS, timeout=2)
             if response.status_code != 200:
                 return False
         except requests.RequestException:
