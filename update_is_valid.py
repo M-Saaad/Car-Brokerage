@@ -109,14 +109,23 @@ def get_updated_entries():
         if not souce_valid or not images_valid:
             invalid_ids.append(entry_id)
             print(f"Marked entry {entry_id} as invalid (website: {website_text} source: {souce_valid}, image: {images_valid})")
+
+        # Process invalid entries in chunks
+        if len(invalid_ids) > 1000:
+            result = listing_collection.update_many(
+                {"_id": {"$in": invalid_ids}},
+                {"$set": {"invalid": True}}
+            )
+            print(f"Bulk updated {result.modified_count} entries.")
+            invalid_ids = []
     
-    # Perform bulk update using update_many if there are invalid entries
-    if invalid_ids:
-        result = listing_collection.update_many(
-            {"_id": {"$in": invalid_ids}},  # Filter by IDs that need to be updated
-            {"$set": {"invalid": True}}  # Update invalid field to True
-        )
-        print(f"Bulk updated {result.modified_count} entries.")
+    # # Perform bulk update using update_many if there are invalid entries
+    # if invalid_ids:
+    #     result = listing_collection.update_many(
+    #         {"_id": {"$in": invalid_ids}},  # Filter by IDs that need to be updated
+    #         {"$set": {"invalid": True}}  # Update invalid field to True
+    #     )
+    #     print(f"Bulk updated {result.modified_count} entries.")
 
     with open("update_logs.json", "w") as json_file:
         json.dump(logs, json_file, indent=4)
