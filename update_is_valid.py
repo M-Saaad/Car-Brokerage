@@ -89,7 +89,10 @@ def get_updated_entries():
         website_text = get_website_name(website_id) if website_id else None
 
         souce_valid = is_valid_url(source)
-        images_valid = is_valid_url(image_urls)
+        if souce_valid:
+            images_valid = is_valid_url(image_urls)
+        else:
+            images_valid = None
 
         logs.append(
             {
