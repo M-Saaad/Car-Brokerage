@@ -108,7 +108,7 @@ def get_updated_entries():
 
         if not souce_valid or not images_valid:
             invalid_ids.append(entry_id)
-            print(f"Marked entry {entry_id} as invalid (website: {website_text} source: {souce_valid}, image: {images_valid})")
+            print(f"Marked entry {entry_id} as invalid (website: {website_text} source: {souce_valid}, image: {images_valid}) IDX: {idx}")
 
         # Process invalid entries in chunks
         if len(invalid_ids) > 1000:
