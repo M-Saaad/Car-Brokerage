@@ -81,7 +81,7 @@ def get_updated_entries():
         logs = []
 
     # Gather IDs of documents with invalid URLs
-    for entry in listings:
+    for idx, entry in enumerate(listings):
         source = entry.get("source")
         image_urls = entry.get("imageUrls")
         entry_id = entry["_id"]
