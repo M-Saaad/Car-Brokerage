@@ -48,6 +48,7 @@ transmission_list = list(transmission_collection.find({}, { 'name': 1 }))
 engineType_list = list(engineType_collection.find({}, { 'name': 1 }))
 color_list = list(color_collection.find({}, { 'name': 1 }))
 website_list = list(website_collection.find({}, { 'name': 1 }))
+color_str_list = [c['name'] for c in color_list]
 
 # OpenAI API key
 with open('credential.json') as json_file:
@@ -132,6 +133,7 @@ class SearchCarDetails(BaseModel):
     engineType: Optional[str]
     registrationStatus: Optional[bool]
     color: Optional[str]
+    expandColors: Optional[List[str]]
     doors: Optional[int]
     seats: Optional[int]
     price_from: Optional[int]
@@ -186,6 +188,16 @@ class CarDetailsRequest(BaseModel):
     damage_part_image: Optional[List[str]]
     special_option_image: Optional[List[str]]
 
+def expand_color_matches(user_colors: List[str], allowed_colors: List[str]) -> List[str]:
+    matches = set()
+    for base_color in user_colors:
+        base_lower = base_color.lower()
+        for allowed in allowed_colors:
+            allowed_lower = allowed.lower()
+            if base_lower in allowed_lower:
+                matches.add(allowed)
+    return list(matches)
+
 @app.post("/prompt-search/", response_model=SearchCarDetailsResponse)
 async def search_listing(car_request: SearchCarRequest):
     try:
@@ -234,6 +246,9 @@ async def search_listing(car_request: SearchCarRequest):
         # Process the OpenAI response
         message = completion.choices[0].message
         if message.parsed:
+            base_color = message.parsed.car_details.color
+            expanded_colors = expand_color_matches(base_color, color_str_list)
+            expanded_colors = [get_id('color', c) for c in expanded_colors]
             # Parse the extracted car details from GPT-4 Vision response
             car_details = {
                 'make': get_id('make', message.parsed.car_details.make),
@@ -251,7 +266,8 @@ async def search_listing(car_request: SearchCarRequest):
                 'engineSize': message.parsed.car_details.engineSize,
                 'engineType': get_id('engineType', message.parsed.car_details.engineType),
                 'registrationStatus': message.parsed.car_details.registrationStatus,
-                'color': get_id('color', message.parsed.car_details.color),
+                'color': get_id('color', base_color),
+                'expandColors': expanded_colors,
                 'doors': message.parsed.car_details.doors,
                 'seats': message.parsed.car_details.seats,
                 'price_from': message.parsed.car_details.price_from or 0,
