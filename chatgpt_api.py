@@ -247,8 +247,11 @@ async def search_listing(car_request: SearchCarRequest):
         message = completion.choices[0].message
         if message.parsed:
             base_color = message.parsed.car_details.color
-            expanded_colors = expand_color_matches(base_color, color_str_list)
-            expanded_colors = [get_id('color', c) for c in expanded_colors]
+            if base_color:
+                expanded_colors = expand_color_matches(base_color, color_str_list)
+                expanded_colors = [get_id('color', c) for c in expanded_colors]
+            else:
+                expanded_colors = None
             # Parse the extracted car details from GPT-4 Vision response
             car_details = {
                 'make': get_id('make', message.parsed.car_details.make),
