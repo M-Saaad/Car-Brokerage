@@ -1,5 +1,5 @@
 # Change user
-su ec2-user
+# su ec2-user
 
 # Change directory to project
 cd /home/ec2-user/backend/Car-Brokerage
@@ -16,7 +16,7 @@ sudo cp /etc/letsencrypt/live/autobrokerai.com/privkey.pem /home/ec2-user/backen
 sudo chown -R ec2-user:ec2-user /home/ec2-user/backend/Car-Brokerage/certs/privkey.pem
 
 # Stop pm2 job for API
-pm2 stop 0
+pm2 stop 1
 
 # Start pm2 job for API
-pm2 start 0
+pm2 start 1
