@@ -1,17 +1,19 @@
-# Change user to autobrokerai
-su autobrokerai
+# Change user
+su ec2-user
 
 # Change directory to project
-cd /home/autobrokerai/Car-Brokerage
+cd /home/ec2-user/backend/Car-Brokerage
 
 # Remove old certs
-rm -rf certs/privkey.pem certs/fullchain.pem
+rm -r certs/privkey.pem certs/fullchain.pem
  
-# Extract private key
-sudo awk '/BEGIN RSA PRIVATE KEY/,/END RSA PRIVATE KEY/' /var/cpanel/ssl/apache_tls/autobrokerai.com/combined > certs/privkey.pem
+# Move fullchain
+sudo cp /etc/letsencrypt/live/autobrokerai.com/fullchain.pem /home/ec2-user/backend/Car-Brokerage/certs
+sudo chown -R ec2-user:ec2-user /home/ec2-user/backend/Car-Brokerage/certs/fullchain.pem
 
-# Extract the first certificate (your server cert)
-sudo awk '/BEGIN CERTIFICATE/,/END CERTIFICATE/' /var/cpanel/ssl/apache_tls/autobrokerai.com/combined | head -n 100 > certs/fullchain.pem
+# Move private key
+sudo cp /etc/letsencrypt/live/autobrokerai.com/privkey.pem /home/ec2-user/backend/Car-Brokerage/certs
+sudo chown -R ec2-user:ec2-user /home/ec2-user/backend/Car-Brokerage/certs/privkey.pem
 
 # Stop pm2 job for API
 pm2 stop 0
