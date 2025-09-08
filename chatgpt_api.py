@@ -38,6 +38,8 @@ engineType_collection = db['enginetypes']
 color_collection = db['colors']
 website_collection = db['website']
 
+countries = listing_collection.distinct("country")
+
 make_list = list(make_collection.find({}, { 'name': 1 }))
 model_list = list(model_collection.find({}, { 'name': 1 }))
 bodyType_list = list(bodyType_collection.find({}, { 'name': 1 }))
@@ -225,7 +227,7 @@ async def search_listing(car_request: SearchCarRequest):
             - Seats: (Number of seats if provided or inferable from make and model)
             - Price From: (Minimum acceptable price based on user input)
             - Price To: (Maximum acceptable price based on user input)
-            - Country: (If mentioned or inferable from context)
+            - Country: ({', '.join(countries)} — follow the rule above)
             - City: (If mentioned or inferable from context)
             - Website: (Reference to where this car might be listed for sale)
             - Features: (Any special features like sunroof, navigation, leather seats, etc.)
