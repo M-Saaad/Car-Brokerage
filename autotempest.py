@@ -379,94 +379,99 @@ def get_id(col_name, field_value):
     else:
         return None
 
-# Initialize the WebDriver with Selenium Wire
-# Set up Chrome options
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
-
-# Set up the driver with the options
-driver = webdriver.Chrome(options=chrome_options)
-
-# Open the website
-driver.get('https://www.autotempest.com/results')  # Replace with the actual URL
-
-sources_btn_xpath = "//button[@id='change-sources-tippy'][1]"
-button = WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.XPATH, sources_btn_xpath))
-)
-button.click()
-
-sources = ['te mash', 'cm mash', 'hem mash', 'cs mash', 'cv mash', 'eb mash', 'tc mash', 'ot mash', 'at ext', 'cg ext', 'st extMash', 'fbm extMash', 'ct ext', 'cgc ext', 'kj ext']
-
-for source in sources[1:]:
-    indicator_div_xpath = f"//span[@class='checkboxWrap  {source}']//div[@class='indicator']"
-    indicator_div = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, indicator_div_xpath))
-    )
-    indicator_div.click()
-
-sources_update_btn_xpath = "//button[@class='update-results'][1]"
-sources_update_btn = WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.XPATH, sources_update_btn_xpath))
-)
-sources_update_btn.click()
-
-sort_dropdown = WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.XPATH, "//select[@id='sort']"))
-)
-sort_dropdown.click()
-newest_option = WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.XPATH, "//select[@id='sort']//option[@value='date_desc']"))
-)
-newest_option.click()
-
-listing_documents = []
-auction_documents = []
-break_flag = False
-
-del driver.requests
-button_xpath = "//button[@class='more-results'][1]"
-
-while True:
+if __name__ == "__main__":
     try:
+        # Initialize the WebDriver with Selenium Wire
+        # Set up Chrome options
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+
+        # Set up the driver with the options
+        driver = webdriver.Chrome(options=chrome_options)
+
+        # Open the website
+        driver.get('https://www.autotempest.com/results')  # Replace with the actual URL
+
+        sources_btn_xpath = "//button[@id='change-sources-tippy'][1]"
         button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, button_xpath))
+            EC.element_to_be_clickable((By.XPATH, sources_btn_xpath))
         )
-
-        driver.execute_script("arguments[0].scrollIntoView(true);", button)
-        driver.execute_script("window.scrollBy(0, -200);")
-
-
         button.click()
-        
-        # # Scrape data after the button click
-        # scrape_data()
-        
-        # Optional: Wait for new data to load before the next interaction
-        time.sleep(3)
 
-        break_flag, temp_listing, temp_auction = get_raw_data(break_flag)
-        listing_documents.extend(temp_listing)
-        auction_documents.extend(temp_auction)
+        sources = ['te mash', 'cm mash', 'hem mash', 'cs mash', 'cv mash', 'eb mash', 'tc mash', 'ot mash', 'at ext', 'cg ext', 'st extMash', 'fbm extMash', 'ct ext', 'cgc ext', 'kj ext']
+
+        for source in sources[1:]:
+            indicator_div_xpath = f"//span[@class='checkboxWrap  {source}']//div[@class='indicator']"
+            indicator_div = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, indicator_div_xpath))
+            )
+            indicator_div.click()
+
+        sources_update_btn_xpath = "//button[@class='update-results'][1]"
+        sources_update_btn = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, sources_update_btn_xpath))
+        )
+        sources_update_btn.click()
+
+        sort_dropdown = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//select[@id='sort']"))
+        )
+        sort_dropdown.click()
+        newest_option = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//select[@id='sort']//option[@value='date_desc']"))
+        )
+        newest_option.click()
+
+        listing_documents = []
+        auction_documents = []
+        break_flag = False
+
         del driver.requests
+        button_xpath = "//button[@class='more-results'][1]"
 
-        if break_flag:
-            break
+        while True:
+            try:
+                button = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.XPATH, button_xpath))
+                )
 
-    except Exception as e:
-        print(f"Button is not available anymore: {e}")
-        break  # Exit loop when button is gone (or exception occurs)
+                driver.execute_script("arguments[0].scrollIntoView(true);", button)
+                driver.execute_script("window.scrollBy(0, -200);")
 
-# listing_documents = upload_data(raw_listing)
-# auction_documents = upload_data(raw_auction)
-if listing_documents:
-    listing_result = listing_collection.insert_many(listing_documents)
-    print("length: ", len(listing_documents))
-if auction_documents:
-    auction_result = auctions_collection.insert_many(auction_documents)
-    print("length: ", len(auction_documents))
+
+                button.click()
+                
+                # # Scrape data after the button click
+                # scrape_data()
+                
+                # Optional: Wait for new data to load before the next interaction
+                time.sleep(3)
+
+                break_flag, temp_listing, temp_auction = get_raw_data(break_flag)
+                listing_documents.extend(temp_listing)
+                auction_documents.extend(temp_auction)
+                del driver.requests
+
+                if break_flag:
+                    break
+
+            except Exception as e:
+                print(f"Button is not available anymore: {e}")
+                break  # Exit loop when button is gone (or exception occurs)
+
+        # listing_documents = upload_data(raw_listing)
+        # auction_documents = upload_data(raw_auction)
+        if listing_documents:
+            listing_result = listing_collection.insert_many(listing_documents)
+            print("length: ", len(listing_documents))
+        if auction_documents:
+            auction_result = auctions_collection.insert_many(auction_documents)
+            print("length: ", len(auction_documents))
+    
+    finally:
+        driver.quit()
 
 # import re
 # import time

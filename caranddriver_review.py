@@ -80,100 +80,30 @@ def recursive_options(xpath, idx):
     except:
         recursive_options(xpath, idx)
 
-documents = []
-
-driver = webdriver.Chrome(options=chrome_options)
-driver.get('https://www.edmunds.com/')
-
-research_dropdown_xpath = "//button[text()='Research Cars']"
-research_dropdown = WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.XPATH, research_dropdown_xpath))
-)
-research_dropdown.click()
-
-time.sleep(2)
-
-make_dropdown_xpath = "//select[@aria-label='Vehicle Make']"
-make_options = driver.find_elements(By.XPATH, make_dropdown_xpath + "//option")
-for make_idx in range(len(make_options[1:5])):
+if __name__ == "__main__":
     try:
-        make_dropdown = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, make_dropdown_xpath))
-        )
-        make_dropdown.click()
-    except:
+
+        documents = []
+
+        driver = webdriver.Chrome(options=chrome_options)
+        driver.get('https://www.edmunds.com/')
+
         research_dropdown_xpath = "//button[text()='Research Cars']"
         research_dropdown = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, research_dropdown_xpath))
         )
         research_dropdown.click()
 
+        time.sleep(2)
+
         make_dropdown_xpath = "//select[@aria-label='Vehicle Make']"
         make_options = driver.find_elements(By.XPATH, make_dropdown_xpath + "//option")
-
-        #try again
-        make_dropdown = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, make_dropdown_xpath))
-        )
-        make_dropdown.click()
-
-    make = recursive_options(make_dropdown_xpath, make_idx)
-
-    time.sleep(1)
-
-    model_dropdown_xpath = "//select[@aria-label='Vehicle Model']"
-    model_options = driver.find_elements(By.XPATH, model_dropdown_xpath + "//option")
-    for model_idx in range(len(model_options[1:])):
-        try:
-            model_dropdown = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, model_dropdown_xpath))
-            )
-            model_dropdown.click()
-        except:
-            research_dropdown_xpath = "//button[text()='Research Cars']"
-            research_dropdown = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, research_dropdown_xpath))
-            )
-            research_dropdown.click()
-
-            time.sleep(2)
-
-            #try again
-            make_dropdown = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, make_dropdown_xpath))
-            )
-            make_dropdown.click()
-
-            time.sleep(1)
-
-            make_dropdown_xpath = "//select[@aria-label='Vehicle Make']"
-            recursive_options(make_dropdown_xpath, make_idx)
-
-            time.sleep(1)
-
-            model_dropdown_xpath = "//select[@aria-label='Vehicle Model']"
-            model_dropdown = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, model_dropdown_xpath))
-            )
-            model_dropdown.click()
-
-        model = recursive_options(model_dropdown_xpath, model_idx)
-
-        time.sleep(1)
-        
-        year_dropdown_xpath = "//select[@aria-label='Vehicle Year']"
-        year_dropdown = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, year_dropdown_xpath))
-        )
-        year_dropdown.click()
-        year_options = driver.find_elements(By.XPATH, year_dropdown_xpath + "//option")
-        for year_idx in range(len(year_options[1:])):
+        for make_idx in range(len(make_options[1:5])):
             try:
-                year = year_options[year_idx+1].text
-                year_opt_ = WebDriverWait(driver, 10).until(
-                    EC.element_to_be_clickable(year_options[year_idx+1])
+                make_dropdown = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.XPATH, make_dropdown_xpath))
                 )
-                year_opt_.click()
+                make_dropdown.click()
             except:
                 research_dropdown_xpath = "//button[text()='Research Cars']"
                 research_dropdown = WebDriverWait(driver, 10).until(
@@ -181,7 +111,8 @@ for make_idx in range(len(make_options[1:5])):
                 )
                 research_dropdown.click()
 
-                time.sleep(2)
+                make_dropdown_xpath = "//select[@aria-label='Vehicle Make']"
+                make_options = driver.find_elements(By.XPATH, make_dropdown_xpath + "//option")
 
                 #try again
                 make_dropdown = WebDriverWait(driver, 10).until(
@@ -189,97 +120,170 @@ for make_idx in range(len(make_options[1:5])):
                 )
                 make_dropdown.click()
 
-                time.sleep(1)
+            make = recursive_options(make_dropdown_xpath, make_idx)
 
-                make_dropdown_xpath = "//select[@aria-label='Vehicle Make']"
+            time.sleep(1)
+
+            model_dropdown_xpath = "//select[@aria-label='Vehicle Model']"
+            model_options = driver.find_elements(By.XPATH, model_dropdown_xpath + "//option")
+            for model_idx in range(len(model_options[1:])):
+                try:
+                    model_dropdown = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, model_dropdown_xpath))
+                    )
+                    model_dropdown.click()
+                except:
+                    research_dropdown_xpath = "//button[text()='Research Cars']"
+                    research_dropdown = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, research_dropdown_xpath))
+                    )
+                    research_dropdown.click()
+
+                    time.sleep(2)
+
+                    #try again
+                    make_dropdown = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, make_dropdown_xpath))
+                    )
+                    make_dropdown.click()
+
+                    time.sleep(1)
+
+                    make_dropdown_xpath = "//select[@aria-label='Vehicle Make']"
+                    recursive_options(make_dropdown_xpath, make_idx)
+
+                    time.sleep(1)
+
+                    model_dropdown_xpath = "//select[@aria-label='Vehicle Model']"
+                    model_dropdown = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, model_dropdown_xpath))
+                    )
+                    model_dropdown.click()
+
+                model = recursive_options(model_dropdown_xpath, model_idx)
+
+                time.sleep(1)
                 
-                recursive_options(make_dropdown_xpath, make_idx)
-
-                time.sleep(1)
-
-                model_options = driver.find_elements(By.XPATH, model_dropdown_xpath + "//option")
-
-                recursive_options(model_dropdown_xpath, model_idx)
-
+                year_dropdown_xpath = "//select[@aria-label='Vehicle Year']"
                 year_dropdown = WebDriverWait(driver, 10).until(
                     EC.element_to_be_clickable((By.XPATH, year_dropdown_xpath))
                 )
                 year_dropdown.click()
+                year_options = driver.find_elements(By.XPATH, year_dropdown_xpath + "//option")
+                for year_idx in range(len(year_options[1:])):
+                    try:
+                        year = year_options[year_idx+1].text
+                        year_opt_ = WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable(year_options[year_idx+1])
+                        )
+                        year_opt_.click()
+                    except:
+                        research_dropdown_xpath = "//button[text()='Research Cars']"
+                        research_dropdown = WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, research_dropdown_xpath))
+                        )
+                        research_dropdown.click()
 
-                recursive_options(year_dropdown_xpath, year_idx)
+                        time.sleep(2)
 
-            go_button_xpath = "//button[text()='GO']"
-            go_btn = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, go_button_xpath))
-            )
-            go_btn.click()
+                        #try again
+                        make_dropdown = WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, make_dropdown_xpath))
+                        )
+                        make_dropdown.click()
 
-            try:
-                title = driver.find_element(By.XPATH, "//h1[@class='css-walxev eyoxkl12']").text
-            except:
-                title = None
-            try:
-                overview = driver.find_element(By.XPATH, "//h2[@title='Overview ']/following-sibling::p").text
-            except:
-                try:
-                    overview = driver.find_element(By.XPATH, "//h2[@title='Overview']/following-sibling::p").text
-                except:
-                    overview = driver.find_element(By.XPATH, "//h2[@title=' Overview']/following-sibling::p").text
-            try:
-                price = get_int(driver.find_element(By.XPATH, "//span[@class='css-1ha3evc eyoxkl10']").text)
-            except:
-                price = None
-            try:
-                imageUrl = driver.find_element(By.XPATH, "//picture/img").get_attribute('src')
-            except:
-                imageUrl = None
+                        time.sleep(1)
 
-            try:
-                rating = get_int(driver.find_element(By.XPATH, "//span[@class='css-1e46sgh eky9wq72']").text)
-            except:
-                rating = None
+                        make_dropdown_xpath = "//select[@aria-label='Vehicle Make']"
+                        
+                        recursive_options(make_dropdown_xpath, make_idx)
 
-            description_tags = driver.find_elements(By.XPATH, "//h2[@title='Overview ']/preceding-sibling::h2 | //h2[@title='Overview ']/preceding-sibling::p | //h2[@title='Overview ']/preceding-sibling::ul | //h2[@title='Overview ']/following-sibling::h2 | //h2[@title='Overview ']/following-sibling::p | //h2[@title='Overview ']/following-sibling::ul")[1:]
-            description = []
-            d = {}
-            for tag in description_tags:
-                if tag.tag_name == 'h2':
-                    if 'h2' in d.keys():
-                        description.append(d)
-                        d = {}
-                    d['h2'] = tag.text
-                elif tag.tag_name == 'p':
-                    d['p'] = tag.text
-                elif tag.tag_name == 'ul':
-                    d['ul'] = tag.text.split('\n')
+                        time.sleep(1)
 
-            if imageUrl:
-                documents.append({
-                    'title': title,
-                    'description': description,
-                    'overview': overview,
-                    'make': make,
-                    'model': model,
-                    'releaseDate': None,
-                    'bodyType': None,
-                    'transmission': None,
-                    'engineSize': None,
-                    'engineType': None,
-                    'fuelConsumption': None,
-                    'price': price,
-                    'maxPower': None,
-                    'maxTorque': None,
-                    'zeroToHundred': None,
-                    'imageUrl': imageUrl,
-                    'fiveStar': None,
-                    'fourStar': None,
-                    'threeStar': None,
-                    'twoStar': None,
-                    'oneStar': None,
-                    'analytics': None,
-                    'rating': rating,
-                    'createdAt': datetime.now(),
-                    'updatedAt': datetime.now()
-                })
+                        model_options = driver.find_elements(By.XPATH, model_dropdown_xpath + "//option")
 
-    pass
+                        recursive_options(model_dropdown_xpath, model_idx)
+
+                        year_dropdown = WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, year_dropdown_xpath))
+                        )
+                        year_dropdown.click()
+
+                        recursive_options(year_dropdown_xpath, year_idx)
+
+                    go_button_xpath = "//button[text()='GO']"
+                    go_btn = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, go_button_xpath))
+                    )
+                    go_btn.click()
+
+                    try:
+                        title = driver.find_element(By.XPATH, "//h1[@class='css-walxev eyoxkl12']").text
+                    except:
+                        title = None
+                    try:
+                        overview = driver.find_element(By.XPATH, "//h2[@title='Overview ']/following-sibling::p").text
+                    except:
+                        try:
+                            overview = driver.find_element(By.XPATH, "//h2[@title='Overview']/following-sibling::p").text
+                        except:
+                            overview = driver.find_element(By.XPATH, "//h2[@title=' Overview']/following-sibling::p").text
+                    try:
+                        price = get_int(driver.find_element(By.XPATH, "//span[@class='css-1ha3evc eyoxkl10']").text)
+                    except:
+                        price = None
+                    try:
+                        imageUrl = driver.find_element(By.XPATH, "//picture/img").get_attribute('src')
+                    except:
+                        imageUrl = None
+
+                    try:
+                        rating = get_int(driver.find_element(By.XPATH, "//span[@class='css-1e46sgh eky9wq72']").text)
+                    except:
+                        rating = None
+
+                    description_tags = driver.find_elements(By.XPATH, "//h2[@title='Overview ']/preceding-sibling::h2 | //h2[@title='Overview ']/preceding-sibling::p | //h2[@title='Overview ']/preceding-sibling::ul | //h2[@title='Overview ']/following-sibling::h2 | //h2[@title='Overview ']/following-sibling::p | //h2[@title='Overview ']/following-sibling::ul")[1:]
+                    description = []
+                    d = {}
+                    for tag in description_tags:
+                        if tag.tag_name == 'h2':
+                            if 'h2' in d.keys():
+                                description.append(d)
+                                d = {}
+                            d['h2'] = tag.text
+                        elif tag.tag_name == 'p':
+                            d['p'] = tag.text
+                        elif tag.tag_name == 'ul':
+                            d['ul'] = tag.text.split('\n')
+
+                    if imageUrl:
+                        documents.append({
+                            'title': title,
+                            'description': description,
+                            'overview': overview,
+                            'make': make,
+                            'model': model,
+                            'releaseDate': None,
+                            'bodyType': None,
+                            'transmission': None,
+                            'engineSize': None,
+                            'engineType': None,
+                            'fuelConsumption': None,
+                            'price': price,
+                            'maxPower': None,
+                            'maxTorque': None,
+                            'zeroToHundred': None,
+                            'imageUrl': imageUrl,
+                            'fiveStar': None,
+                            'fourStar': None,
+                            'threeStar': None,
+                            'twoStar': None,
+                            'oneStar': None,
+                            'analytics': None,
+                            'rating': rating,
+                            'createdAt': datetime.now(),
+                            'updatedAt': datetime.now()
+                        })
+
+    finally:
+        driver.quit()
