@@ -250,6 +250,8 @@ async def search_listing(car_request: SearchCarRequest):
         if message.parsed:
             base_color = message.parsed.car_details.color
             if base_color:
+                if not isinstance(base_color, list):
+                    base_color = [base_color]
                 expanded_colors = expand_color_matches(base_color, color_str_list)
                 expanded_colors = [get_id('color', c) for c in expanded_colors]
             else:
