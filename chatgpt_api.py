@@ -142,6 +142,7 @@ class SearchCarDetails(BaseModel):
     price_to: Optional[int]
     country: Optional[str]
     city: Optional[str]
+    state: Optional[str]
     website: Optional[str]
     features: Optional[List[str]]
 
@@ -229,6 +230,7 @@ async def search_listing(car_request: SearchCarRequest):
             - Price To: (Maximum acceptable price based on user input)
             - Country: ({', '.join(countries)} — follow the rule above)
             - City: (If mentioned or inferable from context)
+            - State: (If mentioned explicitly OR inferable from the provided city + country)
             - Website: (Reference to where this car might be listed for sale)
             - Features: (Any special features like sunroof, navigation, leather seats, etc.)
 
@@ -281,6 +283,7 @@ async def search_listing(car_request: SearchCarRequest):
                 'price_to': message.parsed.car_details.price_to or 0,
                 'country': message.parsed.car_details.country,
                 'city': message.parsed.car_details.city,
+                'state': message.parsed.car_details.state,
                 'website': get_id('website', message.parsed.car_details.website),
                 'features': message.parsed.car_details.features
             }
