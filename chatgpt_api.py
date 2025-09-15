@@ -275,7 +275,7 @@ async def search_listing(car_request: SearchCarRequest):
                 'engineSize': message.parsed.car_details.engineSize,
                 'engineType': get_id('engineType', message.parsed.car_details.engineType),
                 'registrationStatus': message.parsed.car_details.registrationStatus,
-                'color': get_id('color', base_color[0]),
+                'color': get_id('color', base_color[0] if base_color else None),
                 'expandColors': expanded_colors,
                 'doors': message.parsed.car_details.doors,
                 'seats': message.parsed.car_details.seats,
